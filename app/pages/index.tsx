@@ -1,55 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  NotionBlockDetailUpdatedDoc,
-  NotionTextTypedoc,
-  NotionHeadingDoc,
-  NotionTodoDoc,
-  NotionCodeDoc,
-  NotionCalloutDoc,
-  NotionDividerDoc,
-  NotionAllTypes,
-} from "@/type/notion.type";
-import BlockRenderer from "@/src/components/notionBlock";
-import { notionBlockNamesDoc } from "@/type/blockNames.type";
 import NotionBlockList from "@/src/components/notionBlockList";
-import NotionBlock from "@/src/components/notionBlockList";
-
-const load = () => {
-  return Promise.resolve();
-};
-
-const makeJson = async (block) => {
-  const blockObject = await load(block.id);
-  return {
-    childrens: blockObject.childrens.map((block) => makeJson(block)),
-  };
-};
-
-const Block = ({ id, block }) => {
-  const [blocks, setBlocks] = useState();
-  const Component = block.type == "a" ? ABlock : BBlock;
-
-  useEffect(() => {
-    load(id).then((blocks) => {
-      setBlocks(blocks);
-    });
-  }, []);
-  if (!blocks) {
-    return <>List</>;
-  }
-  return (
-    <Component>
-      {blocks.map((block) => (
-        <Block id={block.id} block={block} />
-      ))}
-    </Component>
-  );
-};
+import { classNames } from "@/utils/functions";
+import { getNotionPage } from "@/utils/getNotionPage";
 
 const IndexPage: React.FC = () => {
   const [pageId, setPageId] = useState("");
-  const [apiResponse, setApiResponse] = useState("");
   const [tempId, setTempId] = useState("");
+  const [pageName, setPageName] = useState("");
+  const [pageIcon, setPageIcon] = useState("");
+  const [pageCover, setPageCover] = useState("");
 
   const handleInputChange = () => {
     console.log(tempId);
@@ -57,22 +16,58 @@ const IndexPage: React.FC = () => {
   };
 
   useEffect(() => {
-    setApiResponse("Ready");
-  }, []);
+    const getPage = async () => {
+      const [name, icon, cover] = await getNotionPage(pageId);
+      setPageName(name);
+      setPageIcon(icon);
+      setPageCover(cover);
+    };
+    if (pageId) getPage();
+  }, [pageId]);
 
   return (
     <div className="notion">
-      <h1 className="notion-h1">Search Page</h1>
-      <input
-        type="text"
-        value={tempId}
-        size={50}
-        onChange={(e) => setTempId(e.target.value)}
-        placeholder="Enter search query"
-      />
-      <button onClick={handleInputChange}>Search</button>
-      {apiResponse && <p>{apiResponse}</p>}
-      {pageId && <NotionBlockList targetId={pageId} />}
+      {!pageId && (
+        <div>
+          <h1 className="notion-h1">Search Page</h1>
+          <input
+            type="text"
+            value={tempId}
+            size={50}
+            onChange={(e) => setTempId(e.target.value)}
+            placeholder="Enter search query"
+          />
+          <button onClick={handleInputChange}>Search</button>
+        </div>
+      )}
+      {pageId && (
+        <div>
+          {pageCover && (
+            <img src={pageCover} alt={pageName} className="notion-page-cover" />
+          )}
+          <main
+            className={classNames(
+              "notion-page",
+              !pageCover && "notion-page-offset"
+            )}
+          >
+            {pageIcon && (
+              <span
+                className={classNames(
+                  "notion-emoji",
+                  "notion-page-icon-cover",
+                  pageCover && "notion-page-icon-offset"
+                )}
+                aria-label={pageIcon}
+              >
+                {pageIcon}
+              </span>
+            )}
+            <div className="notion-title">{pageName}</div>
+            <NotionBlockList targetId={pageId} />
+          </main>
+        </div>
+      )}
     </div>
   );
 };

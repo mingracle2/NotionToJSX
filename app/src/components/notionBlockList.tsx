@@ -1,16 +1,6 @@
-import { notionBlockNamesDoc } from "@/type/blockNames.type";
-import {
-  NotionTextTypedoc,
-  NotionHeadingDoc,
-  NotionTodoDoc,
-  NotionCodeDoc,
-  NotionCalloutDoc,
-  NotionDividerDoc,
-  NotionAllTypes,
-  NotionRichTextDoc,
-} from "@/type/notion.type";
+import { NotionAllTypes } from "@/type/notion.type";
 import { getNotionBlocks } from "@/utils/getNotionBlocks";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NotionBlock from "./notionBlock";
 
 export interface NotionBlockListProps {
@@ -19,6 +9,7 @@ export interface NotionBlockListProps {
 
 const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
   const [notionBlocks, setNotionBlocks] = useState<NotionAllTypes[]>([]);
+  const [numberOfIndents, setNumberOfIndents] = useState(0);
 
   useEffect(() => {
     const getNotionData = async () => {
@@ -29,12 +20,12 @@ const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
   }, [targetId]);
 
   if (!notionBlocks) {
-    return <>List</>;
+    return <>No Blocks</>;
   }
 
   return (
     <>
-      {notionBlocks.map((block, index) => (
+      {notionBlocks.map((block) => (
         <NotionBlock block={block} key={block.id} />
       ))}
     </>

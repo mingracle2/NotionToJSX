@@ -4,7 +4,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 export const notionIntegrationToken =
   "Bearer secret_6Fa7uOy0Rlygt7aD7WNUX4z0sPtHj7Has4Gsjk3pMsx";
-const PAGE_ID = "0eae189d2bc4424f98cac94ad55cd0f4";
 
 type Data = {
   name: string;

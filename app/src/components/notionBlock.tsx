@@ -1,58 +1,63 @@
 import { notionBlockNamesDoc } from "@/type/blockNames.type";
+import { NotionAllTypes } from "@/type/notion.type";
 import {
-  NotionTextTypedoc,
-  NotionHeadingDoc,
-  NotionTodoDoc,
-  NotionCodeDoc,
-  NotionCalloutDoc,
-  NotionDividerDoc,
-  NotionAllTypes,
-  NotionRichTextDoc,
-} from "@/type/notion.type";
-import NotionBlockList from "./notionBlockList";
+  NotionBulletedListItemBlock,
+  NotionCalloutBlock,
+  NotionCodeBlock,
+  NotionHeading1Block,
+  NotionHeading2Block,
+  NotionHeading3Block,
+  NotionNumberedListItemBlock,
+  NotionParagraphBlock,
+  NotionQuoteBlock,
+  NotionTodoBlock,
+  NotionToggleBlock,
+  NotionDividerBlock,
+} from "@/utils/notionBlockClasses";
 
 export interface NotionBlockProps {
   block: NotionAllTypes;
 }
 
 const NotionBlock = ({ block }: NotionBlockProps) => {
-  const blockType: string =
-    block.type === notionBlockNamesDoc.BULLETED_LIST_ITEM
-      ? "notion-list notion-list-disc"
-      : block.type === notionBlockNamesDoc.CALLOUT
-      ? "notion-callout notion-callout-text"
-      : block.type === notionBlockNamesDoc.CODE
-      ? "notion-code"
-      : block.type === notionBlockNamesDoc.HEADING_1
-      ? "notion-h1"
-      : block.type === notionBlockNamesDoc.HEADING_2
-      ? "notion-h1"
-      : block.type === notionBlockNamesDoc.HEADING_3
-      ? "notion-h1"
-      : block.type === notionBlockNamesDoc.NUMBERED_LIST_ITEM
-      ? "notion-list notion-list-numbered"
-      : block.type === notionBlockNamesDoc.PARAGRAPH
-      ? "notion"
-      : block.type === notionBlockNamesDoc.QUOTE
-      ? "notion-quote"
-      : block.type === notionBlockNamesDoc.TO_DO
-      ? "notion"
-      : block.type === notionBlockNamesDoc.TOGGLE
-      ? "notion-toggle"
-      : "notion";
-  const classIs = "notion-red";
-  return (
-    <div key={block.id}>
-      {block[block.type].rich_text.map((text: NotionRichTextDoc) => {
-        return (
-          <div className={blockType} key={text.plain_text}>
-            {text.plain_text}
-          </div>
-        );
-      })}
-      <NotionBlockList targetId={block.id} />
-    </div>
-  );
+  switch (block.type) {
+    case notionBlockNamesDoc.BULLETED_LIST_ITEM:
+      const bulletedListItemBlock = new NotionBulletedListItemBlock(block);
+      return bulletedListItemBlock.getTextJsx();
+    case notionBlockNamesDoc.CALLOUT:
+      const calloutBlock = new NotionCalloutBlock(block);
+      return calloutBlock.getTextJsx();
+    case notionBlockNamesDoc.CODE:
+      const codeBlock = new NotionCodeBlock(block);
+      return codeBlock.getTextJsx();
+    case notionBlockNamesDoc.HEADING_1:
+      const heading1Block = new NotionHeading1Block(block);
+      return heading1Block.getTextJsx();
+    case notionBlockNamesDoc.HEADING_2:
+      const heading2Block = new NotionHeading2Block(block);
+      return heading2Block.getTextJsx();
+    case notionBlockNamesDoc.HEADING_3:
+      const heading3Block = new NotionHeading3Block(block);
+      return heading3Block.getTextJsx();
+    case notionBlockNamesDoc.NUMBERED_LIST_ITEM:
+      const numberedListBlock = new NotionNumberedListItemBlock(block);
+      return numberedListBlock.getTextJsx();
+    case notionBlockNamesDoc.PARAGRAPH:
+      const paragraphBlock = new NotionParagraphBlock(block);
+      return paragraphBlock.getTextJsx();
+    case notionBlockNamesDoc.QUOTE:
+      const quoteBlock = new NotionQuoteBlock(block);
+      return quoteBlock.getTextJsx();
+    case notionBlockNamesDoc.TO_DO:
+      const todoBlock = new NotionTodoBlock(block);
+      return todoBlock.getTextJsx();
+    case notionBlockNamesDoc.TOGGLE:
+      const toggleBlock = new NotionToggleBlock(block);
+      return toggleBlock.getTextJsx();
+    case notionBlockNamesDoc.DIVIDER:
+      const dividerBlock = new NotionDividerBlock(block);
+      return dividerBlock.getChild();
+  }
 };
 
 export default NotionBlock;
