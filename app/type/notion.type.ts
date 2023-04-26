@@ -92,10 +92,26 @@ export type NotionDividerDoc = NotionBlockBasicDoc & {
   type: notionBlockNamesDoc.DIVIDER;
 };
 
+export type NotionImageDoc = NotionBlockBasicDoc & {
+  type: notionBlockNamesDoc.IMAGE;
+  image: {
+    type: string;
+    file?: {
+      url: string;
+      expiry_time: string;
+    };
+    external?: {
+      url: string;
+    };
+    [key: string]: any;
+  };
+};
+
 export type NotionAllTypes =
   | NotionTextTypedoc
   | NotionHeadingDoc
   | NotionTodoDoc
   | NotionCodeDoc
   | NotionCalloutDoc
-  | NotionDividerDoc;
+  | NotionDividerDoc
+  | NotionImageDoc;

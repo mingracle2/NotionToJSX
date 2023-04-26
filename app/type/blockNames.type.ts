@@ -15,7 +15,7 @@ export enum notionBlockNamesDoc {
   HEADING_1 = "heading_1",
   HEADING_2 = "heading_2",
   HEADING_3 = "heading_3",
-  IMAGE = "image", // not implemented
+  IMAGE = "image",
   LINK_PREVIEW = "link_preview", // not implemented
   LINK_TO_PAGE = "link_to_page", // not implemented
   NUMBERED_LIST_ITEM = "numbered_list_item",

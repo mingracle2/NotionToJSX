@@ -14,6 +14,9 @@ const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
   useEffect(() => {
     const getNotionData = async () => {
       const notionBlockList: NotionAllTypes[] = await getNotionBlocks(targetId);
+      // notionBlockList.forEach((block) => {
+      //   console.log(block.type);
+      // });
       setNotionBlocks(notionBlockList);
     };
     getNotionData();

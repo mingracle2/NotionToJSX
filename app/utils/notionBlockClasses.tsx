@@ -20,14 +20,14 @@ export class NotionTextTypeBlock extends NotionBasicBlock {
       <div>
         <div key={this.block.id} className={this.className}>
           {this.block[this.block.type].rich_text.map(
-            (text: NotionRichTextDoc) => {
+            (text: NotionRichTextDoc, index: number) => {
               return (
                 <span
                   className={addColorAndCodeClass(
                     text,
                     this.block[this.block.type].color
                   )}
-                  key={text.plain_text}
+                  key={text.plain_text + this.block.id + index}
                   style={{
                     ...(text.annotations.bold ? { fontWeight: "bold" } : {}),
                     ...(text.annotations.italic ? { fontStyle: "italic" } : {}),
@@ -142,6 +142,17 @@ export class NotionDividerBlock extends NotionBasicBlock {
   getChild = () => {
     return (
       <div key={this.block.id}>
+        <NotionBlockList targetId={this.block.id} />
+      </div>
+    );
+  };
+}
+
+export class NotionImageBlock extends NotionBasicBlock {
+  getImage = () => {
+    return (
+      <div key={this.block.id}>
+        <img src={this.block.image[this.block.image.type].url} />
         <NotionBlockList targetId={this.block.id} />
       </div>
     );

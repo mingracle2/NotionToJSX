@@ -13,6 +13,7 @@ import {
   NotionTodoBlock,
   NotionToggleBlock,
   NotionDividerBlock,
+  NotionImageBlock,
 } from "@/utils/notionBlockClasses";
 
 export interface NotionBlockProps {
@@ -57,6 +58,12 @@ const NotionBlock = ({ block }: NotionBlockProps) => {
     case notionBlockNamesDoc.DIVIDER:
       const dividerBlock = new NotionDividerBlock(block);
       return dividerBlock.getChild();
+    case notionBlockNamesDoc.IMAGE:
+      console.log("image accessed");
+      const imageBlock = new NotionImageBlock(block);
+      return imageBlock.getImage();
+    default:
+      return <></>;
   }
 };
 
