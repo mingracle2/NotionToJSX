@@ -20,27 +20,26 @@ export type NotionBlockBasicDoc = {
   };
   has_children: boolean;
   archived: boolean;
+  color: colorType;
+  [key: string]: any;
 };
 
-type NotionRichTextDoc = {
-  rich_text: {
-    type: string;
-    text: {
-      content: string;
-      link: null;
-    };
-    annotations: {
-      bold: boolean;
-      italic: boolean;
-      strikethrough: boolean;
-      underline: boolean;
-      code: boolean;
-      color: colorType;
-    };
-    plain_text: string;
-    href: null;
-  }[];
-  color: colorType;
+export type NotionRichTextDoc = {
+  type: string;
+  text: {
+    content: string;
+    link: null;
+  };
+  annotations: {
+    bold: boolean;
+    italic: boolean;
+    strikethrough: boolean;
+    underline: boolean;
+    code: boolean;
+    color: colorType;
+  };
+  plain_text: string;
+  href: null;
 };
 
 export type NotionTextTypedoc = NotionBlockBasicDoc & {
@@ -62,49 +61,41 @@ export type NotionHeadingDoc = NotionBlockBasicDoc & {
     | notionBlockNamesDoc.HEADING_1
     | notionBlockNamesDoc.HEADING_2
     | notionBlockNamesDoc.HEADING_3;
-  heading_1?: NotionRichTextDoc;
-  heading_2?: NotionRichTextDoc;
-  heading_3?: NotionRichTextDoc;
+  heading_1?: { rich_text: NotionRichTextDoc[] };
+  heading_2?: { rich_text: NotionRichTextDoc[] };
+  heading_3?: { rich_text: NotionRichTextDoc[] };
   is_toggleable: boolean;
 };
 
 export type NotionTodoDoc = NotionBlockBasicDoc & {
   type: notionBlockNamesDoc.TO_DO;
-  to_do: NotionRichTextDoc;
+  to_do: { rich_text: NotionRichTextDoc[] };
   checked: boolean;
 };
 
 export type NotionCodeDoc = NotionBlockBasicDoc & {
   type: notionBlockNamesDoc.CODE;
-  caption: {
-    type: string;
-    text: {
-      content: string;
-      link: null;
-    };
-    annotations: {
-      bold: boolean;
-      italic: boolean;
-      strikethrough: boolean;
-      underline: boolean;
-      code: boolean;
-      color: colorType;
-    };
-    plain_text: string;
-    href: null;
-  }[];
-  code: NotionRichTextDoc;
+  caption: { rich_text: NotionRichTextDoc[] };
+  code: { rich_text: NotionRichTextDoc[] };
   language: string;
 };
 
 export type NotionCalloutDoc = NotionBlockBasicDoc & {
   type: notionBlockNamesDoc.CALLOUT;
-  callout: NotionRichTextDoc;
+  callout: { rich_text: NotionRichTextDoc[] };
   icon: {
     type: string;
     emoji: object;
   };
 };
+
+export type NotionAllTypes =
+  | NotionTextTypedoc
+  | NotionHeadingDoc
+  | NotionTodoDoc
+  | NotionCodeDoc
+  | NotionCalloutDoc
+  | NotionDividerDoc;
 
 export type NotionDividerDoc = NotionBlockBasicDoc & {
   type: notionBlockNamesDoc.DIVIDER;
@@ -118,26 +109,4 @@ export type NotionBlockDetailUpdatedDoc = NotionBlockDetailDoc & {
   numberOfTabs: number;
   id: string;
   type: notionBlockNamesDoc;
-};
-
-export type NotionBlockDetailDoc = {
-  rich_text: {
-    type: string;
-    text: {
-      content: string;
-      link: null;
-    };
-    annotations: {
-      bold: boolean;
-      italic: boolean;
-      strikethrough: boolean;
-      underline: boolean;
-      code: boolean;
-      color: colorType;
-    };
-    plain_text: string;
-    href: null;
-  }[];
-  color: colorType;
-  is_toggleable?: boolean;
 };

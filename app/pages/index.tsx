@@ -1,209 +1,78 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  NotionBlockBasicDoc,
-  NotionBlockDetailDoc,
-  NotionBlockDoc,
   NotionBlockDetailUpdatedDoc,
+  NotionTextTypedoc,
+  NotionHeadingDoc,
+  NotionTodoDoc,
+  NotionCodeDoc,
+  NotionCalloutDoc,
+  NotionDividerDoc,
+  NotionAllTypes,
 } from "@/type/notion.type";
-import BlockRenderer from "@/src/components/blockRenderer";
+import BlockRenderer from "@/src/components/notionBlock";
+import { notionBlockNamesDoc } from "@/type/blockNames.type";
+import NotionBlockList from "@/src/components/notionBlockList";
+import NotionBlock from "@/src/components/notionBlockList";
 
-// const load = () => { return Promise.resolve()}
+const load = () => {
+  return Promise.resolve();
+};
 
-// const makeJson = async (block) => {
-//   const blockObject = await load(block.id);
-//   return {
-//     childrens: blockObject.childrens.map(block => makeJson(block))
-//   }
-// }
+const makeJson = async (block) => {
+  const blockObject = await load(block.id);
+  return {
+    childrens: blockObject.childrens.map((block) => makeJson(block)),
+  };
+};
 
-// const Block = ({id, block}) => {
-//   const [blocks, setBlocks] = useState();
-//   const Component = block.type == "a" ? ABlock : BBlock;
+const Block = ({ id, block }) => {
+  const [blocks, setBlocks] = useState();
+  const Component = block.type == "a" ? ABlock : BBlock;
 
-//   useEffect(() => {
-//     load(id).then(blocks => { setBlocks(blocks) })
-//   }, []);
-//   if (!blocks) {
-//     return <>List</>;
-//   }
-//   return <Component>
-//       {blocks.map(block => <Block id={block.id} block={block}/>)}
-//     </Component>;
-// };
-
-// 오ㅑ
+  useEffect(() => {
+    load(id).then((blocks) => {
+      setBlocks(blocks);
+    });
+  }, []);
+  if (!blocks) {
+    return <>List</>;
+  }
+  return (
+    <Component>
+      {blocks.map((block) => (
+        <Block id={block.id} block={block} />
+      ))}
+    </Component>
+  );
+};
 
 const IndexPage: React.FC = () => {
-  const [inputText, setInputText] = useState("");
+  const [pageId, setPageId] = useState("");
   const [apiResponse, setApiResponse] = useState("");
-  const [blockProperties, setBlockProperties] = useState<
-    NotionBlockDetailUpdatedDoc[]
-  >([]);
+  const [tempId, setTempId] = useState("");
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInputText(event.target.value);
+  const handleInputChange = () => {
+    console.log(tempId);
+    setPageId(tempId);
   };
 
   useEffect(() => {
     setApiResponse("Ready");
-  }, [inputText]);
-
-  const getBlocksFromPage = async () => {
-    // Call API and receive response
-    const blockResponse = await (
-      await fetch("api/notion/notionContent", {
-        method: "POST",
-        body: JSON.stringify({ value: inputText }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-    ).json();
-
-    const blockList: NotionBlockDoc[] = blockResponse.results
-      ? blockResponse.results
-      : "";
-
-    setApiResponse("Loading...Please Wait");
-    await getBlockContents(blockList, 0);
-    setApiResponse("");
-  };
-
-  const getBlockContents = async (
-    blockList: NotionBlockDoc[],
-    numberOfTabs: number
-  ) => {
-    let i;
-    for (i = 0; i < 1000; i++) {
-      const block: NotionBlockDoc = blockList[i];
-      if (block) {
-        const blockId = block.id;
-        const blockHasChild = block.has_children;
-        switch (block.type) {
-          case "heading_1":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.heading_1,
-                numberOfTabs: numberOfTabs,
-                type: "heading_1",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "heading_2":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.heading_1,
-                numberOfTabs: numberOfTabs,
-                type: "heading_1",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "heading_3":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.heading_3,
-                numberOfTabs: numberOfTabs,
-                type: "heading_3",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "paragraph":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.paragraph,
-                numberOfTabs: numberOfTabs,
-                type: "paragraph",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "bulleted_list_item":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.bulleted_list_item,
-                numberOfTabs: numberOfTabs,
-                type: "bulleted_list_item",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "numbered_list_item":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.numbered_list_item,
-                numberOfTabs: numberOfTabs,
-                type: "numbered_list_item",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "to_do":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.to_do,
-                numberOfTabs: numberOfTabs,
-                type: "to_do",
-                id: blockId,
-              },
-            ]);
-            break;
-          case "toggle":
-            setBlockProperties((prevBlockProperties) => [
-              ...prevBlockProperties,
-              {
-                ...block.toggle,
-                numberOfTabs: numberOfTabs,
-                type: "toggle",
-                id: blockId,
-              },
-            ]);
-            break;
-          default:
-        }
-        // console.log(blockId + " " + block.type + " " + blockText);
-        if (blockHasChild) {
-          const childBlockResponse = await (
-            await fetch(`/api/notion/notionContent`, {
-              method: "POST",
-              body: JSON.stringify({ value: blockId }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            })
-          ).json();
-          const childBlocks: NotionBlockDoc[] = childBlockResponse.results
-            ? childBlockResponse.results
-            : "";
-          await getBlockContents(childBlocks, numberOfTabs + 1);
-        }
-      }
-      // console.log(blockId);
-    }
-  };
+  }, []);
 
   return (
     <div className="notion">
       <h1 className="notion-h1">Search Page</h1>
       <input
         type="text"
-        value={inputText}
+        value={tempId}
         size={50}
-        onChange={handleInputChange}
+        onChange={(e) => setTempId(e.target.value)}
         placeholder="Enter search query"
       />
-      <button onClick={getBlocksFromPage}>Search</button>
+      <button onClick={handleInputChange}>Search</button>
       {apiResponse && <p>{apiResponse}</p>}
-      <BlockRenderer blocks={blockProperties} />
+      {pageId && <NotionBlockList targetId={pageId} />}
     </div>
   );
 };
