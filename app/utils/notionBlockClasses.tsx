@@ -15,7 +15,7 @@ export class NotionBasicBlock {
 }
 
 export class NotionTextTypeBlock extends NotionBasicBlock {
-  initialReturn = () => {
+  renderinitialBlock = () => {
     return (
       <div>
         <div key={this.block.id} className={this.className}>
@@ -52,89 +52,89 @@ export class NotionTextTypeBlock extends NotionBasicBlock {
 }
 
 export class NotionBulletedListItemBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames(
       "notion-list",
       "notion-list-disc",
       this.className
     );
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionNumberedListItemBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames(
       "notion-list",
       "notion-list-numbered",
       this.className
     );
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionCalloutBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames(
       "notion-callout",
       "notion-callout-text",
       this.className
     );
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionCodeBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames("notion-code", this.className);
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionHeading1Block extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames("notion-h1", this.className);
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionHeading2Block extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames("notion-h2", this.className);
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionHeading3Block extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames("notion-h3", this.className);
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionParagraphBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
-    return this.initialReturn();
+  renderTextJsx = () => {
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionQuoteBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames("notion-quote", this.className);
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionTodoBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
-    return this.initialReturn();
+  renderTextJsx = () => {
+    return this.renderinitialBlock();
   };
 }
 
 export class NotionToggleBlock extends NotionTextTypeBlock {
-  getTextJsx = () => {
+  renderTextJsx = () => {
     this.className = classNames("notion-toggle", this.className);
-    return this.initialReturn();
+    return this.renderinitialBlock();
   };
 }
 
@@ -142,6 +142,7 @@ export class NotionDividerBlock extends NotionBasicBlock {
   getChild = () => {
     return (
       <div key={this.block.id}>
+        <hr className="notion-hr" />
         <NotionBlockList targetId={this.block.id} />
       </div>
     );
@@ -152,9 +153,34 @@ export class NotionImageBlock extends NotionBasicBlock {
   getImage = () => {
     return (
       <div key={this.block.id}>
-        <img src={this.block.image[this.block.image.type].url} />
+        <figure className="notion-asset-wrapper">
+          <img src={this.block.image[this.block.image.type].url} />
+        </figure>
         <NotionBlockList targetId={this.block.id} />
       </div>
+    );
+  };
+}
+
+export class NotionColumnListBlock extends NotionBasicBlock {
+  renderColumnList = () => {
+    return (
+      <div className="notion-row" style={{ display: "flex" }}>
+        <NotionBlockList targetId={this.block.id} />
+      </div>
+    );
+  };
+}
+
+export class NotionColumnBlock extends NotionBasicBlock {
+  renderColumn = () => {
+    return (
+      <>
+        <div className="notion-column">
+          <NotionBlockList targetId={this.block.id} />
+        </div>
+        <div className="notion-spacer" style={{ width: 40 }} />
+      </>
     );
   };
 }

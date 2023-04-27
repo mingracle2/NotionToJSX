@@ -1,4 +1,4 @@
-export enum notionBlockNamesDoc {
+export enum NotionBlockNamesDoc {
   BOOKMARK = "bookmark", // not implemented
   BREADCRUMB = "breadcrumb", // not implemented
   BULLETED_LIST_ITEM = "bulleted_list_item",

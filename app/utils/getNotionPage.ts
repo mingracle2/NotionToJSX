@@ -1,7 +1,7 @@
 export const getNotionPage = async (targetId: string) => {
   // Call API and receive response
-  const blockResponse = await (
-    await fetch("api/notion/notionPageContent", {
+  const titleResponse = await (
+    await fetch("api/notion/notionPageTitle", {
       method: "POST",
       body: JSON.stringify({ value: targetId }),
       headers: {
@@ -10,8 +10,8 @@ export const getNotionPage = async (targetId: string) => {
     })
   ).json();
 
-  const titleResponse = await (
-    await fetch("api/notion/notionPageTitle", {
+  const blockResponse = await (
+    await fetch("api/notion/notionPageContent", {
       method: "POST",
       body: JSON.stringify({ value: targetId }),
       headers: {
