@@ -20,9 +20,13 @@ export const getNotionPage = async (targetId: string) => {
     })
   ).json();
 
-  const pageName = titleResponse.results[0].title.plain_text;
-  const pageIcon = blockResponse.icon.emoji;
-  const pageCover = blockResponse.cover[blockResponse.cover.type].url;
+  const pageName = titleResponse.results
+    ? titleResponse.results[0].title.plain_text
+    : "";
+  const pageIcon = blockResponse.icon ? blockResponse.icon.emoji : "";
+  const pageCover = blockResponse.cover
+    ? blockResponse.cover[blockResponse.cover.type].url
+    : "";
   // return pageName[0].plain_text;
   return [pageName, pageIcon, pageCover];
 };

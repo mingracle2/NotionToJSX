@@ -1,5 +1,5 @@
 import { NotionBlockNamesDoc } from "@/type/blockNames.type";
-import { NotionAllTypes } from "@/type/notion.type";
+import { NotionBlockAllDoc } from "@/type/notion.type";
 import {
   NotionBulletedListItemBlock,
   NotionCalloutBlock,
@@ -16,10 +16,13 @@ import {
   NotionImageBlock,
   NotionColumnListBlock,
   NotionColumnBlock,
+  NotionBookmarkBlock,
+  NotionVideoBlock,
+  NotionEmbedBlock,
 } from "@/utils/notionBlockClasses";
 
 export interface NotionBlockProps {
-  block: NotionAllTypes;
+  block: NotionBlockAllDoc;
 }
 
 const NotionBlock = ({ block }: NotionBlockProps) => {
@@ -63,12 +66,21 @@ const NotionBlock = ({ block }: NotionBlockProps) => {
     case NotionBlockNamesDoc.IMAGE:
       const imageBlock = new NotionImageBlock(block);
       return imageBlock.getImage();
+    case NotionBlockNamesDoc.VIDEO:
+      const videoBlock = new NotionVideoBlock(block);
+      return videoBlock.renderVideo();
+    case NotionBlockNamesDoc.EMBED:
+      const embedBlock = new NotionEmbedBlock(block);
+      return embedBlock.renderEmbed();
     case NotionBlockNamesDoc.COLUMN_LIST:
       const columnListBlock = new NotionColumnListBlock(block);
       return columnListBlock.renderColumnList();
     case NotionBlockNamesDoc.COLUMN:
       const columnBlock = new NotionColumnBlock(block);
       return columnBlock.renderColumn();
+    case NotionBlockNamesDoc.BOOKMARK:
+      const bookmarkBlock = new NotionBookmarkBlock(block);
+      return bookmarkBlock.renderBookmark();
     default:
       return <div></div>;
   }
