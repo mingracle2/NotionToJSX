@@ -29,11 +29,11 @@ const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
   }
 
   return (
-    <>
+    <ol>
       {notionBlocks.map((block) => (
         <NotionBlock block={block} key={block.id} />
       ))}
-    </>
+    </ol>
   );
 };
 
