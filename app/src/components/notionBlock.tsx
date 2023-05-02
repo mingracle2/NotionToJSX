@@ -56,7 +56,7 @@ const NotionBlock = ({ block }: NotionBlockProps) => {
       return quoteBlock.renderTextJsx();
     case NotionBlockNamesDoc.TO_DO:
       const todoBlock = new NotionTodoBlock(block);
-      return todoBlock.renderTextJsx();
+      return todoBlock.renderTodoBox();
     case NotionBlockNamesDoc.TOGGLE:
       const toggleBlock = new NotionToggleBlock(block);
       return toggleBlock.renderTextJsx();

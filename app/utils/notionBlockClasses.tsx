@@ -6,30 +6,15 @@ import { addColorAndCodeClass, classNames } from "./functions";
 export class NotionBasicBlock {
   block: NotionBlockAllDoc;
   className: string;
-  icon: string;
   constructor(block: NotionBlockAllDoc) {
     this.block = block;
     this.className = "";
-    this.icon = "";
   }
-  renderIcon = () => {
-    return (
-      <span>
-        {this.icon === "" ? (
-          <span style={{ fontWeight: "bold" }}>{this.icon}</span>
-        ) : (
-          <span style={{ fontWeight: "bold", marginLeft: "-12px" }}>
-            {this.icon}
-          </span>
-        )}
-      </span>
-    );
-  };
   renderChildren = () => {
     return (
-      <div style={{ marginLeft: "20px" }}>
+      <>
         <NotionBlockList targetId={this.block.id} />
-      </div>
+      </>
     );
   };
 }
@@ -39,7 +24,6 @@ export class NotionTextTypeBlock extends NotionBasicBlock {
     return (
       <div>
         <div key={this.block.id} className={this.className}>
-          <>{this.renderIcon()}</>
           {this.block[this.block.type].rich_text.map(
             (text: NotionRichTextDoc, index: number) => {
               return (
@@ -80,8 +64,45 @@ export class NotionBulletedListItemBlock extends NotionTextTypeBlock {
       "notion-list-disc",
       this.className
     );
-    this.icon = " • ";
-    return this.renderInitialBlock();
+    return (
+      <div>
+        <ul>
+          {/* <li key={this.block.id} className={this.className}> */}
+          <li>
+            {this.block[this.block.type].rich_text.map(
+              (text: NotionRichTextDoc, index: number) => {
+                return (
+                  <a
+                    href={text.href}
+                    className={addColorAndCodeClass(
+                      text,
+                      this.block[this.block.type].color
+                    )}
+                    key={text.plain_text + this.block.id + index}
+                    style={{
+                      ...(text.annotations.bold ? { fontWeight: "bold" } : {}),
+                      ...(text.annotations.italic
+                        ? { fontStyle: "italic" }
+                        : {}),
+                      ...(text.annotations.underline
+                        ? { textDecoration: "underline" }
+                        : {}),
+                      ...(text.annotations.strikethrough
+                        ? { textDecoration: "line-through" }
+                        : {}),
+                    }}
+                  >
+                    {text.plain_text}
+                  </a>
+                );
+              }
+            )}
+          </li>
+        </ul>
+        {this.renderChildren()}
+        {/* </li> */}
+      </div>
+    );
   };
 }
 
@@ -92,8 +113,37 @@ export class NotionNumberedListItemBlock extends NotionTextTypeBlock {
       "notion-list-numbered",
       this.className
     );
-    this.icon = " • ";
-    return this.renderInitialBlock();
+    return (
+      <li>
+        {this.block[this.block.type].rich_text.map(
+          (text: NotionRichTextDoc, index: number) => {
+            return (
+              <a
+                href={text.href}
+                className={addColorAndCodeClass(
+                  text,
+                  this.block[this.block.type].color
+                )}
+                key={text.plain_text + this.block.id + index}
+                style={{
+                  ...(text.annotations.bold ? { fontWeight: "bold" } : {}),
+                  ...(text.annotations.italic ? { fontStyle: "italic" } : {}),
+                  ...(text.annotations.underline
+                    ? { textDecoration: "underline" }
+                    : {}),
+                  ...(text.annotations.strikethrough
+                    ? { textDecoration: "line-through" }
+                    : {}),
+                }}
+              >
+                {text.plain_text}
+              </a>
+            );
+          }
+        )}
+        <ol>{this.renderChildren()}</ol>
+      </li>
+    );
   };
 }
 
@@ -117,9 +167,6 @@ export class NotionCodeBlock extends NotionTextTypeBlock {
 
 export class NotionHeading1Block extends NotionTextTypeBlock {
   renderTextJsx = () => {
-    if (this.block.is_toggleable) {
-      this.icon = " ► ";
-    }
     this.className = classNames("notion-h1", this.className);
     return this.renderInitialBlock();
   };
@@ -127,9 +174,6 @@ export class NotionHeading1Block extends NotionTextTypeBlock {
 
 export class NotionHeading2Block extends NotionTextTypeBlock {
   renderTextJsx = () => {
-    if (this.block.is_toggleable) {
-      this.icon = " ► ";
-    }
     this.className = classNames("notion-h2", this.className);
     return this.renderInitialBlock();
   };
@@ -137,9 +181,6 @@ export class NotionHeading2Block extends NotionTextTypeBlock {
 
 export class NotionHeading3Block extends NotionTextTypeBlock {
   renderTextJsx = () => {
-    if (this.block.is_toggleable) {
-      this.icon = " ► ";
-    }
     this.className = classNames("notion-h3", this.className);
     return this.renderInitialBlock();
   };
@@ -159,18 +200,57 @@ export class NotionQuoteBlock extends NotionTextTypeBlock {
 }
 
 export class NotionTodoBlock extends NotionTextTypeBlock {
-  renderTextJsx = () => {
-    this.icon = " □ ";
-    return this.renderInitialBlock();
+  renderTodoBox = () => {
+    return (
+      <div>
+        <input
+          style={{ float: "left" }}
+          type="checkbox"
+          id="checkbox"
+          name=""
+        />
+        {this.renderInitialBlock()}
+      </div>
+    );
   };
 }
 
 export class NotionToggleBlock extends NotionTextTypeBlock {
   renderTextJsx = () => {
     this.className = classNames("notion-toggle", this.className);
-    this.icon = " ► ";
-
-    return this.renderInitialBlock();
+    return (
+      <details className="notion-toggle">
+        <summary key={this.block.id} className={this.className}>
+          {this.block[this.block.type].rich_text.map(
+            (text: NotionRichTextDoc, index: number) => {
+              return (
+                <a
+                  href={text.href}
+                  className={addColorAndCodeClass(
+                    text,
+                    this.block[this.block.type].color
+                  )}
+                  key={text.plain_text + this.block.id + index}
+                  style={{
+                    ...(text.annotations.bold ? { fontWeight: "bold" } : {}),
+                    ...(text.annotations.italic ? { fontStyle: "italic" } : {}),
+                    ...(text.annotations.underline
+                      ? { textDecoration: "underline" }
+                      : {}),
+                    ...(text.annotations.strikethrough
+                      ? { textDecoration: "line-through" }
+                      : {}),
+                  }}
+                >
+                  {text.plain_text}
+                </a>
+              );
+            }
+          )}
+        </summary>
+        <div>{this.renderChildren()}</div>
+      </details>
+    );
   };
 }
 
