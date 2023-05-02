@@ -1,4 +1,4 @@
-import { NotionAllTypes } from "@/type/notion.type";
+import { NotionBlockAllDoc } from "@/type/notion.type";
 import { getNotionBlocks } from "@/utils/getNotionBlocks";
 import { useEffect, useState } from "react";
 import NotionBlock from "./notionBlock";
@@ -8,12 +8,14 @@ export interface NotionBlockListProps {
 }
 
 const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
-  const [notionBlocks, setNotionBlocks] = useState<NotionAllTypes[]>([]);
+  const [notionBlocks, setNotionBlocks] = useState<NotionBlockAllDoc[]>([]);
   const [numberOfIndents, setNumberOfIndents] = useState(0);
 
   useEffect(() => {
     const getNotionData = async () => {
-      const notionBlockList: NotionAllTypes[] = await getNotionBlocks(targetId);
+      const notionBlockList: NotionBlockAllDoc[] = await getNotionBlocks(
+        targetId
+      );
       // notionBlockList.forEach((block) => {
       //   console.log(block.type);
       // });
