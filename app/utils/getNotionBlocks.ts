@@ -4,7 +4,7 @@ import { NotionBlockAllDoc } from "@/type/notion.type";
 export const getNotionBlocks = async (targetId: string) => {
   // Call API and receive response
   const blockResponse = await (
-    await fetch("api/notion/notionBlockContent", {
+    await fetch("/api/notion/notionBlockContent", {
       method: "POST",
       body: JSON.stringify({ value: targetId }),
       headers: {

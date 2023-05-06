@@ -1,7 +1,7 @@
 export const getNotionPage = async (targetId: string) => {
   // Call API and receive response
   const titleResponse = await (
-    await fetch("api/notion/notionPageTitle", {
+    await fetch("/api/notion/notionPageTitle", {
       method: "POST",
       body: JSON.stringify({ value: targetId }),
       headers: {
@@ -11,7 +11,7 @@ export const getNotionPage = async (targetId: string) => {
   ).json();
 
   const blockResponse = await (
-    await fetch("api/notion/notionPageContent", {
+    await fetch("/api/notion/notionPageContent", {
       method: "POST",
       body: JSON.stringify({ value: targetId }),
       headers: {
@@ -28,5 +28,6 @@ export const getNotionPage = async (targetId: string) => {
     ? blockResponse.cover[blockResponse.cover.type].url
     : "";
   // return pageName[0].plain_text;
+  console.log({ pageName, pageIcon, pageCover });
   return [pageName, pageIcon, pageCover];
 };

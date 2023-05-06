@@ -1,5 +1,4 @@
 //not used anymore
-import { getNotionBlocks } from "@/utils/getNotionBlocks";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useEffect, useState } from "react";
 

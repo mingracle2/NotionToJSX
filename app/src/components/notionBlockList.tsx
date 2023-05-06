@@ -9,19 +9,17 @@ export interface NotionBlockListProps {
 
 const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
   const [notionBlocks, setNotionBlocks] = useState<NotionBlockAllDoc[]>([]);
-  const [numberOfIndents, setNumberOfIndents] = useState(0);
 
   useEffect(() => {
-    const getNotionData = async () => {
-      const notionBlockList: NotionBlockAllDoc[] = await getNotionBlocks(
-        targetId
-      );
-      // notionBlockList.forEach((block) => {
-      //   console.log(block.type);
-      // });
-      setNotionBlocks(notionBlockList);
-    };
-    getNotionData();
+    if (targetId) {
+      const getNotionData = async () => {
+        const notionBlockList: NotionBlockAllDoc[] = await getNotionBlocks(
+          targetId
+        );
+        setNotionBlocks(notionBlockList);
+      };
+      getNotionData();
+    }
   }, [targetId]);
 
   if (!notionBlocks) {
@@ -31,7 +29,7 @@ const NotionBlockList = ({ targetId }: NotionBlockListProps) => {
   return (
     <ol>
       {notionBlocks.map((block) => (
-        <NotionBlock block={block} key={block.id} />
+        <NotionBlock key={block.id} block={block} />
       ))}
     </ol>
   );
