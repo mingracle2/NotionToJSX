@@ -12,12 +12,8 @@ interface NotionUlBlockProps {
 
 const NotionUlBlock = ({ className, block }: NotionUlBlockProps) => {
   return (
-    <li
-      style={{ marginLeft: "3px" }}
-      key={block.id}
-      className={classNames("", className)}
-    >
-      <span style={{ marginLeft: "-3px" }}>
+    <li key={block.id} className={classNames("", className)}>
+      <span style={{ marginLeft: "-7px" }}>
         {block[block.type].rich_text.map(
           (text: NotionRichText, index: number) => {
             return (

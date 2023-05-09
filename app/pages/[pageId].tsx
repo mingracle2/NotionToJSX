@@ -55,6 +55,8 @@ const CustomNotionPage = () => {
         <NotionBlock pageId={pageId} />
       </main>
       <br></br>
+      <br></br>
+      <br></br>
     </div>
   );
 };

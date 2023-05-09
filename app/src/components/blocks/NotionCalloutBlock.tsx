@@ -13,16 +13,11 @@ interface NotionCalloutBlockProps {
 
 const NotionCalloutBlock = ({ className, block }: NotionCalloutBlockProps) => {
   return (
-    <div
-      key={block.id}
-      className={classNames(
-        addColorClass(block[block.type].color),
-        "notion-callout",
-        className
-      )}
-    >
-      <a>{block[block.type].icon.emoji}</a>
-      <span className="notion-callout-text">
+    <div>
+      <span className={classNames("notion-page-icon", "notion-emoji")}>
+        {block?.[block.type].icon.emoji}
+      </span>
+      <span key={block.id} className="notion-callout-text">
         {block[block.type].rich_text.map(
           (text: NotionRichText, index: number) => {
             return (

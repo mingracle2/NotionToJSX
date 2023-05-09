@@ -145,8 +145,11 @@ export interface NotionHeading3BlockDoc extends NotionBasicBlockDoc {
 
 export interface NotionTodoBlockDoc extends NotionBasicBlockDoc {
   type: BlockTypes.to_do;
-  to_do: NotionBasicBlockTypeObject;
-  checked: boolean;
+  to_do: {
+    rich_text: NotionRichText[];
+    color: NotionTextColors;
+    checked: boolean;
+  };
 }
 
 export interface NotionCodeBlockDoc extends NotionBasicBlockDoc {
@@ -270,21 +273,3 @@ export interface NotionRichTextAnnotation {
   code: boolean; // false
   color: string; // default"
 }
-
-export type NotionRichTextDoc = {
-  type: string;
-  text: {
-    content: string;
-    link: string;
-  };
-  annotations: {
-    bold: boolean;
-    italic: boolean;
-    strikethrough: boolean;
-    underline: boolean;
-    code: boolean;
-    color: NotionTextColors;
-  };
-  plain_text: string;
-  href: string;
-};

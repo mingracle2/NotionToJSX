@@ -17,6 +17,7 @@ import NotionEmbedBlock from "./NotionEmbedBlock";
 import NotionUlBlock from "./NotionUlBlock";
 import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
+import { addColorClass, classNames } from "@/utils/functions";
 
 const renderBlock = (block: any) => {
   switch (block.type) {
@@ -67,11 +68,13 @@ interface NotionAsyncBlockProps {
 /* useEffect를 통해 async로 자식 Block 을 불러오는 Component 입니다 */
 export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
   const [childrenBlocks, setChildrenBlocks] = useState<any[]>([]);
+  const [numOfChildrenBlocks, setNumOfChildrenBlocks] = useState(0);
 
   const fetchChildren = useCallback(async (blockId: string) => {
     const blocks = await getNotionBlocks(blockId);
-    console.log({ blocks });
+    // console.log({ blocks });
     setChildrenBlocks(() => blocks);
+    setNumOfChildrenBlocks(blocks.length);
   }, []);
 
   const needToggle: boolean =
@@ -83,6 +86,13 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
 
   const isColumnList: boolean = block?.type === BlockTypes.column_list;
   const isColumn: boolean = block?.type === BlockTypes.column;
+  const isCallout: boolean = block?.type === BlockTypes.callout;
+
+  const widthOfChildrenColumns =
+    (
+      (100 * (1 - 0.35 * (numOfChildrenBlocks - 1))) /
+      numOfChildrenBlocks
+    ).toFixed(0) + "%";
 
   useEffect(() => {
     if (block?.has_children && block?.id) {
@@ -97,10 +107,17 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
   }, [pageId]);
 
   return (
-    <span>
+    <span
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log(block?.id, block?.type, { block });
+      }}
+    >
       {needToggle ? (
         <details className="notion-toggle">
-          <summary>{block && renderBlock(block)}</summary>
+          <summary style={{ marginLeft: "5px" }}>
+            <span>{block && renderBlock(block)}</span>
+          </summary>
           <ul>
             {childrenBlocks.map((childBlock) => {
               return <NotionBlock key={childBlock.id} block={childBlock} />;
@@ -109,29 +126,61 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
         </details>
       ) : isColumnList ? (
         <div className="notion-row">
-          <ul>
-            {childrenBlocks.map((childBlock) => {
-              return <NotionBlock key={childBlock.id} block={childBlock} />;
-            })}
-          </ul>
+          {childrenBlocks.map((childBlock, index) => {
+            return (
+              <>
+                <div style={{ flex: 1, width: widthOfChildrenColumns }}>
+                  <NotionBlock key={childBlock.id} block={childBlock} />
+                </div>
+                <div className="notion-spacer" style={{ width: "3.5%" }} />
+              </>
+            );
+          })}
         </div>
       ) : isColumn ? (
         <>
-          <div className="notion-column" style={{ flex: 1, maxWidth: "100%" }}>
-            <ul>
+          <div className="notion-column">
+            <ul style={{ flex: 1, width: "100%" }}>
               {childrenBlocks.map((childBlock) => {
                 return <NotionBlock key={childBlock.id} block={childBlock} />;
               })}
             </ul>
           </div>
-          <div className="notion-spacer" style={{ width: 40 }} />
+        </>
+      ) : isCallout ? (
+        <div
+          className={classNames(
+            addColorClass(block?.[block.type].color),
+            "notion-callout"
+          )}
+        >
+          {block && renderBlock(block)}
+          {/* Render Children */}
+          <div>
+            <ul style={{ paddingLeft: "35px" }}>
+              {childrenBlocks.map((childBlock) => {
+                return <NotionBlock key={childBlock.id} block={childBlock} />;
+              })}
+            </ul>
+          </div>
+        </div>
+      ) : block ? (
+        <>
+          {/* Render Block */}
+          {block && renderBlock(block)}
+          {/* Render Children */}
+          <ul>
+            {childrenBlocks.map((childBlock) => {
+              return <NotionBlock key={childBlock.id} block={childBlock} />;
+            })}
+          </ul>
         </>
       ) : (
         <>
           {/* Render Block */}
           {block && renderBlock(block)}
           {/* Render Children */}
-          <ul>
+          <ul style={{ paddingLeft: "0px" }}>
             {childrenBlocks.map((childBlock) => {
               return <NotionBlock key={childBlock.id} block={childBlock} />;
             })}

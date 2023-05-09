@@ -124,9 +124,6 @@
   font-size: 1.875em;
   margin-top: 1.4em;
 }
-.notion-h1:first-child {
-  margin-top: 0;
-}
 .notion-h2 {
   font-size: 1.5em;
   margin-top: 1.1em;
@@ -203,7 +200,6 @@ img.notion-page-icon-offset {
   border-left: 3px solid currentcolor;
   padding: 0.2em 0.9em;
   margin: 0;
-  font-size: 1.2em;
 }
 .notion-hr {
   margin: 6px 0px;
@@ -496,7 +492,6 @@ img.notion-page-icon {
 
 .notion-callout {
   padding: 16px 16px 16px 12px;
-  display: inline-flex;
   width: 100%;
   border-radius: 3px;
   border-width: 1px;
@@ -511,7 +506,7 @@ img.notion-page-icon {
 
 .notion-toggle {
   padding: 3px 2px;
-  text-indent: -15px;
+  /* text-indent: -15px; */
 }
 .notion-toggle > summary {
   cursor: pointer;
@@ -519,6 +514,10 @@ img.notion-page-icon {
 }
 .notion-toggle > div {
   margin-left: 1.1em;
+}
+
+.notion-h1 .notion-toggle > summary {
+  margin-top: 10px;
 }
 
 .notion-table,
@@ -685,12 +684,45 @@ img.notion-nav-icon {
 }
 
 li {
+  margin-left: 3px;
   list-style-position: inside;
-  padding-top: 2.5px;
-  padding-bottom: 2.5px;
-  text-indent: -15px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  text-indent: 5px;
 }
 
 ul {
   padding-left: 20px;
+}
+
+summary {
+  display: block;
+  padding-left: 1rem;
+  position: relative;
+  cursor: pointer;
+}
+
+summary span:before {
+  content: "";
+  border-width: 0.4rem;
+  border-style: solid;
+  border-color: transparent transparent transparent #000;
+  position: absolute;
+  top: 0.5rem;
+  left: 0rem;
+  transform: rotate(0);
+  transform-origin: 0.2rem 50%;
+  transition: 0.25s transform ease;
+}
+
+summary span:hover:before {
+  background-color: #d9dddc;
+}
+
+details[open] > summary span:before {
+  transform: rotate(90deg);
+}
+
+details summary::-webkit-details-marker {
+  display: none;
 }

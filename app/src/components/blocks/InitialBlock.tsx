@@ -1,4 +1,8 @@
-import { NotionBasicBlockDoc, NotionRichText } from "@/type/notion.type";
+import {
+  BlockTypes,
+  NotionBasicBlockDoc,
+  NotionRichText,
+} from "@/type/notion.type";
 import {
   addColorAndCodeClass,
   addColorClass,
@@ -12,15 +16,22 @@ interface InitialBlockProps {
 
 const InitialBlock = ({ className, block }: InitialBlockProps) => {
   return (
-    <div
-      className={classNames(addColorClass(block[block.type].color), className)}
-    >
+    <div>
       {block[block.type].rich_text.length === 0 ? (
         <br></br>
       ) : (
-        <div key={block.id}>
+        <pre
+          key={block.id}
+          style={{ whiteSpace: "pre-line" }}
+          className={classNames(
+            addColorClass(block[block.type].color),
+            className,
+            "notion"
+          )}
+        >
           {block[block.type].rich_text.map(
             (text: NotionRichText, index: number) => {
+              const brString = text.plain_text.replace(/\n/g, "<br>");
               return (
                 <a
                   key={text.plain_text + block.id + index}
@@ -39,13 +50,12 @@ const InitialBlock = ({ className, block }: InitialBlockProps) => {
                       ? { textDecoration: "line-through" }
                       : {}),
                   }}
-                >
-                  {text.plain_text}
-                </a>
+                  dangerouslySetInnerHTML={{ __html: brString }}
+                ></a>
               );
             }
           )}
-        </div>
+        </pre>
       )}
     </div>
   );
