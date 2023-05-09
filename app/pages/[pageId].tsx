@@ -1,5 +1,4 @@
 import NotionBlock from "@/src/components/blocks/NotionBlock";
-import NotionBlockList from "@/src/components/notionBlockList";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useRouter } from "next/router";
