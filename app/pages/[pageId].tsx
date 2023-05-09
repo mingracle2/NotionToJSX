@@ -1,15 +1,17 @@
+import NotionBlock from "@/src/components/blocks/NotionBlock";
 import NotionBlockList from "@/src/components/notionBlockList";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const renderedPage = () => {
+const CustomNotionPage = () => {
+  const router = useRouter();
+
   const [pageName, setPageName] = useState("");
   const [pageIcon, setPageIcon] = useState("");
   const [pageCover, setPageCover] = useState("");
 
-  const router = useRouter();
   const pageId: string =
     typeof router.query.pageId === "string" ? router.query.pageId : "";
 
@@ -51,10 +53,11 @@ const renderedPage = () => {
           </span>
         )}
         <div className="notion-title">{pageName}</div>
-        <NotionBlockList targetId={pageId} />
+        <NotionBlock pageId={pageId} />
       </main>
+      <br></br>
     </div>
   );
 };
 
-export default renderedPage;
+export default CustomNotionPage;
