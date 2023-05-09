@@ -511,6 +511,7 @@ img.notion-page-icon {
 
 .notion-toggle {
   padding: 3px 2px;
+  text-indent: -15px;
 }
 .notion-toggle > summary {
   cursor: pointer;
@@ -685,4 +686,11 @@ img.notion-nav-icon {
 
 li {
   list-style-position: inside;
+  padding-top: 2.5px;
+  padding-bottom: 2.5px;
+  text-indent: -15px;
+}
+
+ul {
+  padding-left: 20px;
 }

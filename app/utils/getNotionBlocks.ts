@@ -1,5 +1,26 @@
-import { NotionBlockNamesDoc } from "@/type/blockNames.type";
-import { NotionBlockAllDoc } from "@/type/notion.type";
+import {
+  NotionBasicBlockDoc,
+  BlockTypes,
+  NotionHeading1BlockDoc,
+  NotionHeading2BlockDoc,
+  NotionHeading3BlockDoc,
+  NotionTodoBlockDoc,
+  NotionBulletedListItemBlockDoc,
+  NotionNumberedListItemBlockDoc,
+  NotionBookmarkBlockDoc,
+  NotionCalloutBlockDoc,
+  NotionCodeBlockDoc,
+  NotionColumnBlockDoc,
+  NotionColumnListBlockDoc,
+  NotionDividerBlockDoc,
+  NotionEmbedBlockDoc,
+  NotionImageBlockDoc,
+  NotionParagraphBlockDoc,
+  NotionQuoteBlockDoc,
+  NotionToggleBlockDoc,
+  NotionVideoBlockDoc,
+  NotionLinkPreviewBlockDoc,
+} from "@/type/notion.type";
 
 export const getNotionBlocks = async (targetId: string) => {
   // Call API and receive response
@@ -13,69 +34,89 @@ export const getNotionBlocks = async (targetId: string) => {
     })
   ).json();
 
-  //   console.log(blockResponse);
-  const notionBlockList: NotionBlockAllDoc[] = [];
-  blockResponse.results.map((result: NotionBlockAllDoc, index: Number) => {
-    let blockType: NotionBlockNamesDoc = result.type;
+  const notionBlockList: any[] = [];
+  blockResponse.results.map((result: any, index: Number) => {
+    const blockType: BlockTypes = result.type;
     console.log(result.id + " " + blockType);
     switch (blockType) {
-      case NotionBlockNamesDoc.PARAGRAPH:
-      case NotionBlockNamesDoc.QUOTE:
-      case NotionBlockNamesDoc.BULLETED_LIST_ITEM:
-      case NotionBlockNamesDoc.NUMBERED_LIST_ITEM:
-      case NotionBlockNamesDoc.TOGGLE:
-        const textTypeBlock: NotionBlockAllDoc = result;
-
-        notionBlockList.push(textTypeBlock);
+      case BlockTypes.paragraph:
+        const paragraphBlock: NotionParagraphBlockDoc = result;
+        notionBlockList.push(paragraphBlock);
         break;
-      case NotionBlockNamesDoc.HEADING_1:
-      case NotionBlockNamesDoc.HEADING_2:
-      case NotionBlockNamesDoc.HEADING_3:
-        const headingBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(headingBlock);
+      case BlockTypes.quote:
+        const quoteBlock: NotionQuoteBlockDoc = result;
+        notionBlockList.push(quoteBlock);
         break;
-      case NotionBlockNamesDoc.TO_DO:
-        const todoBlock: NotionBlockAllDoc = result;
+      case BlockTypes.bulleted_list_item:
+        const bulletedListItemBlock: NotionBulletedListItemBlockDoc = result;
+        notionBlockList.push(bulletedListItemBlock);
+        break;
+      case BlockTypes.numbered_list_item:
+        const numberedListItemBlock: NotionNumberedListItemBlockDoc = result;
+        notionBlockList.push(numberedListItemBlock);
+        break;
+      case BlockTypes.toggle:
+        const toggleBlock: NotionToggleBlockDoc = result;
+        notionBlockList.push(toggleBlock);
+        break;
+      case BlockTypes.heading_1:
+        const heading1Block: NotionHeading1BlockDoc = result;
+        notionBlockList.push(heading1Block);
+        break;
+      case BlockTypes.heading_2:
+        const heading2Block: NotionHeading2BlockDoc = result;
+        notionBlockList.push(heading2Block);
+        break;
+      case BlockTypes.heading_3:
+        const heading3Block: NotionHeading3BlockDoc = result;
+        notionBlockList.push(heading3Block);
+        break;
+      case BlockTypes.to_do:
+        const todoBlock: NotionTodoBlockDoc = result;
         notionBlockList.push(todoBlock);
         break;
-      case NotionBlockNamesDoc.CODE:
-        const codeBlock: NotionBlockAllDoc = result;
+      case BlockTypes.code:
+        const codeBlock: NotionCodeBlockDoc = result;
         notionBlockList.push(codeBlock);
         break;
-      case NotionBlockNamesDoc.CALLOUT:
-        const calloutBlock: NotionBlockAllDoc = result;
+      case BlockTypes.callout:
+        const calloutBlock: NotionCalloutBlockDoc = result;
         notionBlockList.push(calloutBlock);
         break;
-      case NotionBlockNamesDoc.DIVIDER:
-        const dividerBlock: NotionBlockAllDoc = result;
+      case BlockTypes.divider:
+        const dividerBlock: NotionDividerBlockDoc = result;
         notionBlockList.push(dividerBlock);
         break;
-      case NotionBlockNamesDoc.IMAGE:
-        const imageBlock: NotionBlockAllDoc = result;
+      case BlockTypes.image:
+        const imageBlock: NotionImageBlockDoc = result;
         notionBlockList.push(imageBlock);
         break;
-      case NotionBlockNamesDoc.VIDEO:
-        const videoBlock: NotionBlockAllDoc = result;
+      case BlockTypes.video:
+        const videoBlock: NotionVideoBlockDoc = result;
         notionBlockList.push(videoBlock);
         break;
-      case NotionBlockNamesDoc.EMBED:
-        const embedBlock: NotionBlockAllDoc = result;
+      case BlockTypes.embed:
+        const embedBlock: NotionEmbedBlockDoc = result;
         notionBlockList.push(embedBlock);
         break;
-      case NotionBlockNamesDoc.COLUMN_LIST:
-        const columnListBlock: NotionBlockAllDoc = result;
+      case BlockTypes.column_list:
+        const columnListBlock: NotionColumnListBlockDoc = result;
         notionBlockList.push(columnListBlock);
         break;
-      case NotionBlockNamesDoc.COLUMN:
-        const columnBlock: NotionBlockAllDoc = result;
+      case BlockTypes.column:
+        const columnBlock: NotionColumnBlockDoc = result;
         notionBlockList.push(columnBlock);
         break;
-      case NotionBlockNamesDoc.BOOKMARK:
-        const bookmarkBlock: NotionBlockAllDoc = result;
+      case BlockTypes.bookmark:
+        const bookmarkBlock: NotionBookmarkBlockDoc = result;
         notionBlockList.push(bookmarkBlock);
         break;
+      case BlockTypes.link_preview:
+        const linkPreviewBlock: NotionLinkPreviewBlockDoc = result;
+        notionBlockList.push(linkPreviewBlock);
       default:
     }
   });
+
   return notionBlockList;
 };
