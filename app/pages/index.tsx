@@ -28,7 +28,7 @@ const IndexPage: React.FC = () => {
       <input
         type="text"
         value={pageUrl}
-        size={50}
+        size={80}
         onChange={(e) => setPageUrl(e.target.value)}
         placeholder="Enter search query"
       />
