@@ -22,7 +22,7 @@ const InitialBlock = ({ className, block }: InitialBlockProps) => {
       ) : (
         <pre
           key={block.id}
-          style={{ whiteSpace: "pre-line" }}
+          style={{ whiteSpace: "pre-wrap" }}
           className={classNames(
             addColorClass(block[block.type].color),
             className,
