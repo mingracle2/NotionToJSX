@@ -18,6 +18,7 @@ import NotionUlBlock from "./NotionUlBlock";
 import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
 import { addColorClass, classNames } from "@/utils/functions";
+import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 
 const renderBlock = (block: any) => {
   switch (block.type) {
@@ -67,7 +68,9 @@ interface NotionAsyncBlockProps {
 
 /* useEffect를 통해 async로 자식 Block 을 불러오는 Component 입니다 */
 export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
-  const [childrenBlocks, setChildrenBlocks] = useState<any[]>([]);
+  const [childrenBlocks, setChildrenBlocks] = useState<NotionBasicBlockDoc[]>(
+    []
+  );
   const [numOfChildrenBlocks, setNumOfChildrenBlocks] = useState(0);
 
   const fetchChildren = useCallback(async (blockId: string) => {
@@ -120,7 +123,9 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           </summary>
           <ul>
             {childrenBlocks.map((childBlock) => {
-              return <NotionBlock key={childBlock.id} block={childBlock} />;
+              return (
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+              );
             })}
           </ul>
         </details>
@@ -130,7 +135,7 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
             return (
               <>
                 <div style={{ flex: 1, width: widthOfChildrenColumns }}>
-                  <NotionBlock key={childBlock.id} block={childBlock} />
+                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
                 </div>
                 <div className="notion-spacer" style={{ width: "3.5%" }} />
               </>
@@ -142,7 +147,9 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           <div className="notion-column">
             <ul style={{ flex: 1, width: "100%" }}>
               {childrenBlocks.map((childBlock) => {
-                return <NotionBlock key={childBlock.id} block={childBlock} />;
+                return (
+                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+                );
               })}
             </ul>
           </div>
@@ -159,7 +166,9 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           <div>
             <ul style={{ paddingLeft: "35px" }}>
               {childrenBlocks.map((childBlock) => {
-                return <NotionBlock key={childBlock.id} block={childBlock} />;
+                return (
+                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+                );
               })}
             </ul>
           </div>
@@ -171,7 +180,9 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           {/* Render Children */}
           <ul>
             {childrenBlocks.map((childBlock) => {
-              return <NotionBlock key={childBlock.id} block={childBlock} />;
+              return (
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+              );
             })}
           </ul>
         </>
@@ -182,7 +193,9 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           {/* Render Children */}
           <ul style={{ paddingLeft: "0px" }}>
             {childrenBlocks.map((childBlock) => {
-              return <NotionBlock key={childBlock.id} block={childBlock} />;
+              return (
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+              );
             })}
           </ul>
         </>
@@ -191,27 +204,81 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
   );
 };
 
-interface AsyncNotionBlockDoc extends NotionBasicBlockDoc {
-  childrenBlocks: AsyncNotionBlockDoc[];
+export interface SyncNotionBlockDoc extends NotionBasicBlockDoc {
+  childrenBlocks: SyncNotionBlockDoc[];
 }
 
-interface NotionSyncBlockProps {
-  block: AsyncNotionBlockDoc; // 자식 block 들이 포함된 block 입니다.
+interface NotionSyncBlockWithIdProps {
+  pageId: string;
 }
 
-/* TODO. SSR을 위해 모든 children을 재귀로 호출하여 결합한 JSON을 만들어 아래 Component에 주입합니다. */
-export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
+export const NotionSyncBlockWithId = ({
+  pageId,
+}: NotionSyncBlockWithIdProps) => {
+  const [notionBlocks, setNotionBlocks] = useState<SyncNotionBlockDoc[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchAllBlocks = async () => {
+    setIsLoading(true);
+
+    try {
+      await constructNotionSyncBlocks({
+        pageId,
+      }).then((result) => {
+        setNotionBlocks(result);
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (pageId) {
+      fetchAllBlocks();
+    }
+  }, [pageId]);
+
+  useEffect(() => {
+    if (notionBlocks.length !== 0) console.log(notionBlocks);
+  }, [notionBlocks]);
+
+  if (isLoading) {
+    return <p>Loading...</p>; // Render a loading indicator while fetching data
+  }
+
   return (
     <>
-      {/* Render Block */}
-      {block && renderBlock(block)}
-      {/* Render Children */}
-      {block.childrenBlocks.map((childBlock) => {
-        return <NotionBlock block={childBlock} />;
+      {notionBlocks.map((block) => {
+        return <NotionSyncBlock key={block.id} block={block} />;
+        // return <>{block.id}</>;
       })}
     </>
   );
 };
-const NotionBlock = NotionAsyncBlock; // SSR을 위해 NotionSyncBlock을 개발하여 변경합니다. 필요에 따라 import하여 사용할 수 있도록 합니다.
 
-export default NotionBlock;
+interface NotionSyncBlockProps {
+  block: SyncNotionBlockDoc; // 자식 block 들이 포함된 block 입니다.
+}
+
+/* TODO. SSR을 위해 모든 children을 재귀로 호출하여 결합한 JSON을 만들어 아래 Component에 주입합니다. */
+export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
+  console.log(block.id);
+  return (
+    <>
+      {/* Render Block */}
+      <>{block.id + " " + block.type}</>
+      <br></br>
+      {/* Render Children */}
+      {block.has_children &&
+        block.childrenBlocks.map((childBlock) => {
+          return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+        })}
+    </>
+  );
+};
+
+const NotionBlock = NotionSyncBlock; // SSR을 위해 NotionSyncBlock을 개발하여 변경합니다. 필요에 따라 import하여 사용할 수 있도록 합니다.
+
+export default NotionAsyncBlock;

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 
 const IndexPage: React.FC = () => {
@@ -9,8 +10,9 @@ const IndexPage: React.FC = () => {
 
   useEffect(() => {
     if (pageId) {
-      console.log(pageId);
-      router.push(`/${pageId}`);
+      // console.log(pageId);
+      // router.push(`/${pageId}`);
+      window.open(`/${pageId}`, "_blank");
     }
   }, [pageId]);
 

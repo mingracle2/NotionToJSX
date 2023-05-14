@@ -1,4 +1,7 @@
-import NotionBlock from "@/src/components/blocks/NotionBlock";
+import NotionBlock, {
+  NotionAsyncBlock,
+  NotionSyncBlockWithId,
+} from "@/src/components/blocks/NotionBlock";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useRouter } from "next/router";
@@ -25,7 +28,10 @@ const CustomNotionPage = () => {
       setPageIcon(icon);
       setPageCover(cover);
     };
-    if (pageId) getPage();
+    if (pageId) {
+      console.log(pageId);
+      getPage();
+    }
   }, [pageId]);
 
   return (
@@ -52,7 +58,7 @@ const CustomNotionPage = () => {
           </span>
         )}
         <div className="notion-title">{pageName}</div>
-        <NotionBlock pageId={pageId} />
+        <NotionAsyncBlock pageId={pageId} />
       </main>
       <br></br>
       <br></br>

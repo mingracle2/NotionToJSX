@@ -34,8 +34,8 @@ export const getNotionBlocks = async (targetId: string) => {
     })
   ).json();
 
-  const notionBlockList: any[] = [];
-  blockResponse.results.map((result: any, index: Number) => {
+  const notionBlockList: NotionBasicBlockDoc[] = [];
+  blockResponse.results.map((result: NotionBasicBlockDoc, index: Number) => {
     const blockType: BlockTypes = result.type;
     // console.log(result.id + " " + blockType);
     switch (blockType) {

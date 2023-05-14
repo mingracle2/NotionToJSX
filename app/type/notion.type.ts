@@ -273,3 +273,5 @@ export interface NotionRichTextAnnotation {
   code: boolean; // false
   color: string; // default"
 }
+
+export interface NotionSyncBlock {}
