@@ -30,6 +30,7 @@ const NotionUlBlock = ({ className, block }: NotionUlBlockProps) => {
                   ...(text.annotations.strikethrough
                     ? { textDecoration: "line-through" }
                     : {}),
+                  ...(text.href ? { opacity: "70%" } : {}),
                   // marginLeft: "-7px",
                 }}
               >

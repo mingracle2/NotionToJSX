@@ -1,4 +1,8 @@
-import { BlockTypes, NotionBasicBlockDoc } from "@/type/notion.type";
+import {
+  BlockTypes,
+  NotionBasicBlockDoc,
+  NotionTableRowBlockDoc,
+} from "@/type/notion.type";
 import { getNotionBlocks } from "@/utils/getNotionBlocks";
 import { useCallback, useEffect, useState } from "react";
 import NotionTodoBlock from "./NotionTodoBlock";
@@ -19,6 +23,7 @@ import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
 import { addColorClass, classNames } from "@/utils/functions";
 import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
+import NotionTableRowBlock from "./NotionTableRowBlock";
 
 const renderBlock = (block: any) => {
   switch (block.type) {
@@ -56,8 +61,10 @@ const renderBlock = (block: any) => {
       return <NotionBookmarkBlock key={block.id} block={block} />;
     case BlockTypes.link_preview:
       return <NotionLinkPreviewBlock key={block.id} block={block} />;
+    // case BlockTypes.table_row:
+    //   return <NotionTableRowBlock key={block.id} block={block} />;
     default:
-      return <div>{block.type}</div>;
+      return <div>{block.id}</div>;
   }
 };
 
@@ -221,17 +228,19 @@ export const NotionSyncBlockWithId = ({
   const fetchAllBlocks = async () => {
     setIsLoading(true);
 
-    try {
-      await constructNotionSyncBlocks({
-        pageId,
-      }).then((result) => {
-        setNotionBlocks(result);
+    const start = Date.now();
+    constructNotionSyncBlocks({
+      pageId,
+    })
+      .then((result) => {
+        const end = Date.now();
+        console.log(end - start, "ms");
+        setNotionBlocks(() => result);
+      })
+      .catch((e) => console.log(e))
+      .finally(() => {
+        setIsLoading(() => false);
       });
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   useEffect(() => {
@@ -264,7 +273,139 @@ interface NotionSyncBlockProps {
 
 /* TODO. SSR을 위해 모든 children을 재귀로 호출하여 결합한 JSON을 만들어 아래 Component에 주입합니다. */
 export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
-  console.log(block.id);
+  // console.log(block.id);
+
+  const needToggle: boolean =
+    block?.type === BlockTypes.toggle ||
+    ((block?.type === BlockTypes.heading_1 ||
+      block?.type === BlockTypes.heading_2 ||
+      block?.type === BlockTypes.heading_3) &&
+      block[block.type].is_toggleable === true);
+
+  const isColumnList: boolean = block?.type === BlockTypes.column_list;
+  const isColumn: boolean = block?.type === BlockTypes.column;
+  const isCallout: boolean = block?.type === BlockTypes.callout;
+  const isTable: boolean = block?.type === BlockTypes.table;
+
+  const numOfChildrenBlocks = block.childrenBlocks.length;
+
+  const widthOfChildrenColumns =
+    (
+      (100 * (1 - 0.35 * (numOfChildrenBlocks - 1))) /
+      numOfChildrenBlocks
+    ).toFixed(0) + "%";
+
+  return (
+    <span
+      onClick={(e) => {
+        e.stopPropagation();
+        console.log(block?.id, block?.type, { block });
+      }}
+    >
+      {needToggle ? (
+        <details className="notion-toggle">
+          <summary style={{ marginLeft: "5px" }}>
+            <span>{block && renderBlock(block)}</span>
+          </summary>
+          <ul>
+            {block.childrenBlocks.map((childBlock) => {
+              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+            })}
+          </ul>
+        </details>
+      ) : isColumnList ? (
+        <div className="notion-row">
+          {block.childrenBlocks.map((childBlock, index) => {
+            return (
+              <>
+                <div style={{ flex: 1, width: widthOfChildrenColumns }}>
+                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
+                </div>
+                <div className="notion-spacer" style={{ width: "3.5%" }} />
+              </>
+            );
+          })}
+        </div>
+      ) : isColumn ? (
+        <>
+          <div className="notion-column">
+            <ul style={{ flex: 1, width: "100%" }}>
+              {block.childrenBlocks.map((childBlock) => {
+                return (
+                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
+                );
+              })}
+            </ul>
+          </div>
+        </>
+      ) : isCallout ? (
+        <div
+          className={classNames(
+            addColorClass(block?.[block.type].color),
+            "notion-callout"
+          )}
+        >
+          {block && renderBlock(block)}
+          {/* Render Children */}
+          <div>
+            <ul style={{ paddingLeft: "35px" }}>
+              {block.childrenBlocks.map((childBlock) => {
+                return (
+                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      ) : isTable ? (
+        <table
+          className={classNames("notion-simple-table")}
+          style={{ marginTop: "10px", marginBottom: "10px" }}
+        >
+          <tbody>
+            {block.childrenBlocks.map(
+              (childBlock: NotionBasicBlockDoc, index: number) => {
+                return (
+                  <NotionTableRowBlock
+                    key={childBlock.id}
+                    block={childBlock}
+                    has_column_header={block[block.type].has_column_header}
+                    has_row_header={block[block.type].has_row_header}
+                    is_first_row={index === 0}
+                  />
+                );
+              }
+            )}
+          </tbody>
+        </table>
+      ) : block ? (
+        <>
+          {/* Render Block */}
+          {block && renderBlock(block)}
+          {/* Render Children */}
+          <ul>
+            {block.childrenBlocks.map((childBlock) => {
+              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+            })}
+          </ul>
+        </>
+      ) : (
+        <></>
+        // <>
+        //   {/* Render Block */}
+        //   {block && renderBlock(block)}
+        //   {/* Render Children */}
+        //   <ul style={{ paddingLeft: "0px" }}>
+        //     {block.childrenBlocks.map((childBlock) => {
+        //       return (
+        //         <NotionSyncBlock key={childBlock.id} block={childBlock} />
+        //       );
+        //     })}
+        //   </ul>
+        // </>
+      )}
+    </span>
+  );
   return (
     <>
       {/* Render Block */}

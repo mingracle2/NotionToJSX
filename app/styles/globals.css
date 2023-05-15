@@ -726,3 +726,24 @@ details[open] > summary span:before {
 details summary::-webkit-details-marker {
   display: none;
 }
+
+.notion-simple-table {
+  border: 1px solid rgba(55, 53, 47, 0.024);
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 14px;
+}
+
+.notion-simple-table td {
+  border: 1px solid rgba(55, 53, 47, 0.024);
+  padding: 8px 8px;
+  white-space: pre-wrap;
+}
+
+/* a:link {
+  color: black;
+}
+
+a:visited {
+  color: black;
+} */

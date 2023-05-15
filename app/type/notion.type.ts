@@ -178,6 +178,7 @@ export interface NotionDividerBlockDoc extends NotionBasicBlockDoc {
 export interface NotionImageBlockDoc extends NotionBasicBlockDoc {
   type: BlockTypes.image;
   image: {
+    caption: NotionRichText[];
     type: string;
     file?: {
       url: string;
@@ -192,20 +193,25 @@ export interface NotionImageBlockDoc extends NotionBasicBlockDoc {
 
 export interface NotionVideoBlockDoc extends NotionBasicBlockDoc {
   type: BlockTypes.video;
-  caption: { rich_text: NotionRichText[] };
-  file?: {
-    url: string;
-    expiry_time: string;
-  };
-  external?: {
-    url: string;
+  video: {
+    caption: NotionRichText[];
+    type: string;
+    file?: {
+      url: string;
+      expiry_time: string;
+    };
+    external?: {
+      url: string;
+    };
   };
 }
 
 export interface NotionEmbedBlockDoc extends NotionBasicBlockDoc {
   type: BlockTypes.embed;
-  caption: { rich_text: NotionRichText[] };
-  url: string;
+  embed: {
+    caption: NotionRichText[];
+    url: string;
+  };
 }
 
 export interface NotionColumnListBlockDoc extends NotionBasicBlockDoc {
@@ -229,6 +235,22 @@ export interface NotionLinkPreviewBlockDoc extends NotionBasicBlockDoc {
   link_preview: {
     caption: { rich_text: NotionRichText[] };
     url: string;
+  };
+}
+
+export interface NotionTableBlockDoc extends NotionBasicBlockDoc {
+  type: BlockTypes.table;
+  table: {
+    table_width: number;
+    has_column_header: boolean;
+    has_row_header: boolean;
+  };
+}
+
+export interface NotionTableRowBlockDoc extends NotionBasicBlockDoc {
+  type: BlockTypes.table_row;
+  table_row: {
+    cells: { rich_text: NotionRichText[] };
   };
 }
 
@@ -273,5 +295,3 @@ export interface NotionRichTextAnnotation {
   code: boolean; // false
   color: string; // default"
 }
-
-export interface NotionSyncBlock {}

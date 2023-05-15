@@ -1,31 +1,50 @@
-import { NotionCodeBlockDoc, NotionRichText } from "@/type/notion.type";
+import {
+  BlockTypes,
+  NotionBasicBlockDoc,
+  NotionRichText,
+} from "@/type/notion.type";
 import {
   addColorAndCodeClass,
   addColorClass,
   classNames,
 } from "@/utils/functions";
-import InitialBlock from "./InitialBlock";
 
-interface NotionCodeBlockProps {
+interface NotionTableRowBlockProps {
   className?: string;
-  block: NotionCodeBlockDoc;
+  block: NotionBasicBlockDoc;
+  has_column_header: boolean;
+  has_row_header: boolean;
+  is_first_row: boolean;
 }
 
-const NotionCodeBlock = ({ className, block }: NotionCodeBlockProps) => {
+const NotionTableRowBlock = ({
+  className,
+  block,
+  has_column_header,
+  has_row_header,
+  is_first_row,
+}: NotionTableRowBlockProps) => {
   return (
-    <div
+    <tr
       className={classNames(
         addColorClass(block[block.type].color),
         className,
-        "notion-code"
+        "notion",
+        "notion-simple-table"
       )}
+      style={
+        is_first_row && has_column_header ? { background: "#87837826" } : {}
+      }
     >
-      {block[block.type].rich_text.length === 0 ? (
-        <br></br>
-      ) : (
-        <pre key={block.id}>
-          {block[block.type].rich_text.map(
-            (text: NotionRichText, index: number) => {
+      {block[block.type].cells.map((cells: NotionRichText[], index: number) => {
+        return (
+          <td
+            key={block.id + index}
+            style={
+              has_row_header && index === 0 ? { background: "#87837826" } : {}
+            }
+          >
+            {cells.map((text: NotionRichText, index: number) => {
               const brString = text.plain_text.replace(/\n/g, "<br>");
               return (
                 <a
@@ -49,12 +68,12 @@ const NotionCodeBlock = ({ className, block }: NotionCodeBlockProps) => {
                   dangerouslySetInnerHTML={{ __html: brString }}
                 ></a>
               );
-            }
-          )}
-        </pre>
-      )}
-    </div>
+            })}
+          </td>
+        );
+      })}
+    </tr>
   );
 };
 
-export default NotionCodeBlock;
+export default NotionTableRowBlock;

@@ -25,14 +25,13 @@ interface GetChildrenBlocksProps {
 }
 
 const getChildrenBlocks = async ({ block }: GetChildrenBlocksProps) => {
-  const childrenBlocks: SyncNotionBlockDoc[] = [];
-  await getNotionBlocks(block.id).then((blocks) => {
-    blocks.forEach((childBlock) => {
-      Promise.resolve(getChildrenBlocks({ block: childBlock })).then((result) =>
-        childrenBlocks.push(result)
-      );
-    });
-  });
+  const initialBlocks: NotionBasicBlockDoc[] = await getNotionBlocks(block.id);
+  const childrenBlocks: SyncNotionBlockDoc[] = await Promise.all(
+    initialBlocks.map(async (childBlock) => {
+      const result = await getChildrenBlocks({ block: childBlock });
+      return result;
+    })
+  );
   const updatedBlock: SyncNotionBlockDoc = {
     ...block,
     childrenBlocks: childrenBlocks,

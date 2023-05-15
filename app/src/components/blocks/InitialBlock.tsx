@@ -49,6 +49,7 @@ const InitialBlock = ({ className, block }: InitialBlockProps) => {
                     ...(text.annotations.strikethrough
                       ? { textDecoration: "line-through" }
                       : {}),
+                    ...(text.href ? { opacity: "70%" } : {}),
                   }}
                   dangerouslySetInnerHTML={{ __html: brString }}
                 ></a>

@@ -75,6 +75,7 @@ const NotionTodoBlock = ({ className, block }: NotionTodoBlockProps) => {
                       ...(text.annotations.strikethrough
                         ? { textDecoration: "line-through" }
                         : {}),
+                      ...(text.href ? { opacity: "70%" } : {}),
                     }}
                   >
                     {text.plain_text}

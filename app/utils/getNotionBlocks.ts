@@ -20,6 +20,8 @@ import {
   NotionToggleBlockDoc,
   NotionVideoBlockDoc,
   NotionLinkPreviewBlockDoc,
+  NotionTableBlockDoc,
+  NotionTableRowBlockDoc,
 } from "@/type/notion.type";
 
 export const getNotionBlocks = async (targetId: string) => {
@@ -114,6 +116,15 @@ export const getNotionBlocks = async (targetId: string) => {
       case BlockTypes.link_preview:
         const linkPreviewBlock = result as NotionLinkPreviewBlockDoc;
         notionBlockList.push(linkPreviewBlock);
+        break;
+      case BlockTypes.table:
+        const tableBlock = result as NotionTableBlockDoc;
+        notionBlockList.push(tableBlock);
+        break;
+      case BlockTypes.table_row:
+        const tableRowBlock = result as NotionTableRowBlockDoc;
+        notionBlockList.push(tableRowBlock);
+        break;
       default:
     }
   });

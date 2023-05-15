@@ -36,6 +36,7 @@ const NotionCalloutBlock = ({ className, block }: NotionCalloutBlockProps) => {
                   ...(text.annotations.strikethrough
                     ? { textDecoration: "line-through" }
                     : {}),
+                  ...(text.href ? { opacity: "70%" } : {}),
                 }}
               >
                 {text.plain_text}

@@ -58,7 +58,7 @@ const CustomNotionPage = () => {
           </span>
         )}
         <div className="notion-title">{pageName}</div>
-        <NotionAsyncBlock pageId={pageId} />
+        <NotionSyncBlockWithId pageId={pageId} />
       </main>
       <br></br>
       <br></br>
