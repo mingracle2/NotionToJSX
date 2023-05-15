@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 const IndexPage: React.FC = () => {
   const [pageUrl, setPageUrl] = useState("");
   const [pageId, setPageId] = useState("");
+  const [isAsync, setIsAsync] = useState(false);
+  const [click, setClick] = useState(false);
 
   const router = useRouter();
 
@@ -12,12 +14,24 @@ const IndexPage: React.FC = () => {
     if (pageId) {
       // console.log(pageId);
       // router.push(`/${pageId}`);
-      window.open(`/${pageId}`, "_blank");
+      window.open(`/${pageId}?isAsync=${isAsync}`, "_blank");
     }
-  }, [pageId]);
+  }, [pageId, click]);
 
-  const handleInputChange = () => {
+  const renderSynchronously = () => {
     if (pageUrl) {
+      setClick(!click);
+      setIsAsync(false);
+      setPageId(
+        pageUrl.split(/[/-]/)[pageUrl.split(/[/-]/).length - 1].split("?")[0]
+      );
+    }
+  };
+
+  const renderAsynchronously = () => {
+    if (pageUrl) {
+      setClick(!click);
+      setIsAsync(true);
       setPageId(
         pageUrl.split(/[/-]/)[pageUrl.split(/[/-]/).length - 1].split("?")[0]
       );
@@ -34,7 +48,13 @@ const IndexPage: React.FC = () => {
         onChange={(e) => setPageUrl(e.target.value)}
         placeholder="Enter search query"
       />
-      <button onClick={handleInputChange}>Search</button>
+      <button
+        onClick={renderSynchronously}
+        style={{ marginLeft: "10px", marginRight: "10px" }}
+      >
+        Sync
+      </button>
+      <button onClick={renderAsynchronously}>Async</button>
     </div>
   );
 };

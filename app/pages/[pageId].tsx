@@ -1,5 +1,6 @@
 import NotionBlock, {
   NotionAsyncBlock,
+  NotionSyncBlock,
 } from "@/src/components/blocks/NotionBlock";
 import NotionDBlock from "@/src/components/blocks/NotionDBlock";
 import { SyncNotionBlockDoc } from "@/type/notion.type";
@@ -19,36 +20,10 @@ const CustomNotionPage = () => {
   const pageId: string =
     typeof router.query.pageId === "string" ? router.query.pageId : "";
 
-  const [notionBlocks, setNotionBlocks] = useState<SyncNotionBlockDoc[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchAllBlocks = async () => {
-    setIsLoading(true);
-
-    const start = Date.now();
-    constructNotionSyncBlocks({
-      pageId,
-    })
-      .then((result) => {
-        const end = Date.now();
-        console.log(end - start, "ms");
-        setNotionBlocks(() => result);
-      })
-      .catch((e) => console.log(e))
-      .finally(() => {
-        setIsLoading(() => false);
-      });
-  };
-
-  useEffect(() => {
-    if (pageId) {
-      fetchAllBlocks();
-    }
-  }, [pageId]);
-
-  useEffect(() => {
-    if (notionBlocks.length !== 0) console.log(notionBlocks);
-  }, [notionBlocks]);
+  const isAsync: boolean =
+    typeof router.query.isAsync === "string" && router.query.isAsync === "true"
+      ? true
+      : false;
 
   useEffect(() => {
     const getPage = async () => {
@@ -63,13 +38,10 @@ const CustomNotionPage = () => {
     };
     if (pageId) {
       console.log(pageId);
+      console.log(isAsync);
       getPage();
     }
   }, [pageId]);
-
-  if (isLoading) {
-    return <p>Loading...</p>; // Render a loading indicator while fetching data
-  }
 
   return (
     <div className="notion">
@@ -97,9 +69,11 @@ const CustomNotionPage = () => {
         <div className="notion-title">{pageName}</div>
         <hr className="notion-hr" />
         <ul style={{ paddingLeft: 0 }}>
-          {notionBlocks.map((block) => {
-            return <NotionBlock key={block.id} block={block} />;
-          })}
+          {isAsync ? (
+            <NotionAsyncBlock pageId={pageId} />
+          ) : (
+            <NotionSyncBlock pageId={pageId} />
+          )}
         </ul>
       </main>
       <br></br>
