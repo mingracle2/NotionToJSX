@@ -8,6 +8,7 @@ import {
   addColorClass,
   classNames,
 } from "@/utils/functions";
+import Image from "next/image";
 
 interface NotionImageBlockProps {
   className?: string;
@@ -19,9 +20,11 @@ const NotionImageBlock = ({ className, block }: NotionImageBlockProps) => {
     // block.image.type === "file"
     //   ? console.log(block.image.file?.url)
     //   : console.log(block.image.external?.url);
-    return block.image.type === "file"
-      ? block.image.file?.url
-      : block.image.external?.url;
+    return block.image.file
+      ? block.image.file.url
+      : block.image.external
+      ? block.image.external.url
+      : "";
   };
 
   return (
