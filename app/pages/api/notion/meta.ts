@@ -38,7 +38,7 @@ export default async function handler(
         // console.log('error:', error); // This returns true or false. True if there was an error. The error itself is inside the results object.
         // console.log('results:', results); // This contains all of the Open Graph results
         // console.log('response:', response); // This contains the HTML of page
-        // console.log({ results });
+        console.log({ results });
 
         res.status(200).json({ ...(results || {}) });
       }

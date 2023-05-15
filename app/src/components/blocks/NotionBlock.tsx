@@ -1,7 +1,9 @@
 import {
   BlockTypes,
   NotionBasicBlockDoc,
+  NotionRichText,
   NotionTableRowBlockDoc,
+  SyncNotionBlockDoc,
 } from "@/type/notion.type";
 import { getNotionBlocks } from "@/utils/getNotionBlocks";
 import { useCallback, useEffect, useState } from "react";
@@ -21,7 +23,11 @@ import NotionEmbedBlock from "./NotionEmbedBlock";
 import NotionUlBlock from "./NotionUlBlock";
 import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
-import { addColorClass, classNames } from "@/utils/functions";
+import {
+  addColorAndCodeClass,
+  addColorClass,
+  classNames,
+} from "@/utils/functions";
 import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 import NotionTableRowBlock from "./NotionTableRowBlock";
 
@@ -61,8 +67,6 @@ const renderBlock = (block: any) => {
       return <NotionBookmarkBlock key={block.id} block={block} />;
     case BlockTypes.link_preview:
       return <NotionLinkPreviewBlock key={block.id} block={block} />;
-    // case BlockTypes.table_row:
-    //   return <NotionTableRowBlock key={block.id} block={block} />;
     default:
       return <div>{block.id}</div>;
   }
@@ -137,18 +141,19 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           </ul>
         </details>
       ) : isColumnList ? (
-        <div className="notion-row">
+        <>
           {childrenBlocks.map((childBlock, index) => {
             return (
-              <>
-                <div style={{ flex: 1, width: widthOfChildrenColumns }}>
-                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
-                </div>
+              <div
+                className="notion-row"
+                style={{ flex: 1, width: widthOfChildrenColumns }}
+              >
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
                 <div className="notion-spacer" style={{ width: "3.5%" }} />
-              </>
+              </div>
             );
           })}
-        </div>
+        </>
       ) : isColumn ? (
         <>
           <div className="notion-column">
@@ -211,62 +216,6 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
   );
 };
 
-export interface SyncNotionBlockDoc extends NotionBasicBlockDoc {
-  childrenBlocks: SyncNotionBlockDoc[];
-}
-
-interface NotionSyncBlockWithIdProps {
-  pageId: string;
-}
-
-export const NotionSyncBlockWithId = ({
-  pageId,
-}: NotionSyncBlockWithIdProps) => {
-  const [notionBlocks, setNotionBlocks] = useState<SyncNotionBlockDoc[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchAllBlocks = async () => {
-    setIsLoading(true);
-
-    const start = Date.now();
-    constructNotionSyncBlocks({
-      pageId,
-    })
-      .then((result) => {
-        const end = Date.now();
-        console.log(end - start, "ms");
-        setNotionBlocks(() => result);
-      })
-      .catch((e) => console.log(e))
-      .finally(() => {
-        setIsLoading(() => false);
-      });
-  };
-
-  useEffect(() => {
-    if (pageId) {
-      fetchAllBlocks();
-    }
-  }, [pageId]);
-
-  useEffect(() => {
-    if (notionBlocks.length !== 0) console.log(notionBlocks);
-  }, [notionBlocks]);
-
-  if (isLoading) {
-    return <p>Loading...</p>; // Render a loading indicator while fetching data
-  }
-
-  return (
-    <>
-      {notionBlocks.map((block) => {
-        return <NotionSyncBlock key={block.id} block={block} />;
-        // return <>{block.id}</>;
-      })}
-    </>
-  );
-};
-
 interface NotionSyncBlockProps {
   block: SyncNotionBlockDoc; // 자식 block 들이 포함된 block 입니다.
 }
@@ -286,6 +235,9 @@ export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
   const isColumn: boolean = block?.type === BlockTypes.column;
   const isCallout: boolean = block?.type === BlockTypes.callout;
   const isTable: boolean = block?.type === BlockTypes.table;
+  const isUl: boolean =
+    block?.type === BlockTypes.bulleted_list_item ||
+    block?.type === BlockTypes.numbered_list_item;
 
   const numOfChildrenBlocks = block.childrenBlocks.length;
 
@@ -314,15 +266,21 @@ export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
           </ul>
         </details>
       ) : isColumnList ? (
-        <div className="notion-row">
+        <div className="notion-row flex space-x-4">
           {block.childrenBlocks.map((childBlock, index) => {
             return (
-              <>
-                <div style={{ flex: 1, width: widthOfChildrenColumns }}>
-                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
-                </div>
-                <div className="notion-spacer" style={{ width: "3.5%" }} />
-              </>
+              <div
+                key={childBlock.id + index}
+                style={{
+                  ...(index === numOfChildrenBlocks - 1
+                    ? {}
+                    : { marginRight: "15px" }),
+                  flex: 1,
+                  width: widthOfChildrenColumns,
+                }}
+              >
+                <NotionSyncBlock key={childBlock.id} block={childBlock} />
+              </div>
             );
           })}
         </div>
@@ -378,6 +336,46 @@ export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
             )}
           </tbody>
         </table>
+      ) : isUl ? (
+        <li key={block.id} className={classNames("")}>
+          <span style={{ marginLeft: "-7px" }}>
+            {block[block.type].rich_text.map(
+              (text: NotionRichText, index: number) => {
+                return (
+                  <a
+                    key={text.plain_text + block.id + index}
+                    href={text.href}
+                    className={addColorAndCodeClass(
+                      text,
+                      block[block.type].color
+                    )}
+                    style={{
+                      ...(text.annotations.bold ? { fontWeight: "bold" } : {}),
+                      ...(text.annotations.italic
+                        ? { fontStyle: "italic" }
+                        : {}),
+                      ...(text.annotations.underline
+                        ? { textDecoration: "underline" }
+                        : {}),
+                      ...(text.annotations.strikethrough
+                        ? { textDecoration: "line-through" }
+                        : {}),
+                      ...(text.href ? { opacity: "70%" } : {}),
+                      // marginLeft: "-7px",
+                    }}
+                  >
+                    {text.plain_text}
+                  </a>
+                );
+              }
+            )}
+          </span>
+          <ul>
+            {block.childrenBlocks.map((childBlock) => {
+              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+            })}
+          </ul>
+        </li>
       ) : block ? (
         <>
           {/* Render Block */}
@@ -391,35 +389,11 @@ export const NotionSyncBlock = ({ block }: NotionSyncBlockProps) => {
         </>
       ) : (
         <></>
-        // <>
-        //   {/* Render Block */}
-        //   {block && renderBlock(block)}
-        //   {/* Render Children */}
-        //   <ul style={{ paddingLeft: "0px" }}>
-        //     {block.childrenBlocks.map((childBlock) => {
-        //       return (
-        //         <NotionSyncBlock key={childBlock.id} block={childBlock} />
-        //       );
-        //     })}
-        //   </ul>
-        // </>
       )}
     </span>
-  );
-  return (
-    <>
-      {/* Render Block */}
-      <>{block.id + " " + block.type}</>
-      <br></br>
-      {/* Render Children */}
-      {block.has_children &&
-        block.childrenBlocks.map((childBlock) => {
-          return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
-        })}
-    </>
   );
 };
 
 const NotionBlock = NotionSyncBlock; // SSR을 위해 NotionSyncBlock을 개발하여 변경합니다. 필요에 따라 import하여 사용할 수 있도록 합니다.
 
-export default NotionAsyncBlock;
+export default NotionBlock;

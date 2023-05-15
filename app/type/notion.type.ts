@@ -295,3 +295,7 @@ export interface NotionRichTextAnnotation {
   code: boolean; // false
   color: string; // default"
 }
+
+export interface SyncNotionBlockDoc extends NotionBasicBlockDoc {
+  childrenBlocks: SyncNotionBlockDoc[];
+}

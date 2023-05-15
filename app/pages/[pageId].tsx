@@ -1,7 +1,9 @@
 import NotionBlock, {
   NotionAsyncBlock,
-  NotionSyncBlockWithId,
 } from "@/src/components/blocks/NotionBlock";
+import NotionDBlock from "@/src/components/blocks/NotionDBlock";
+import { SyncNotionBlockDoc } from "@/type/notion.type";
+import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useRouter } from "next/router";
@@ -16,6 +18,37 @@ const CustomNotionPage = () => {
 
   const pageId: string =
     typeof router.query.pageId === "string" ? router.query.pageId : "";
+
+  const [notionBlocks, setNotionBlocks] = useState<SyncNotionBlockDoc[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchAllBlocks = async () => {
+    setIsLoading(true);
+
+    const start = Date.now();
+    constructNotionSyncBlocks({
+      pageId,
+    })
+      .then((result) => {
+        const end = Date.now();
+        console.log(end - start, "ms");
+        setNotionBlocks(() => result);
+      })
+      .catch((e) => console.log(e))
+      .finally(() => {
+        setIsLoading(() => false);
+      });
+  };
+
+  useEffect(() => {
+    if (pageId) {
+      fetchAllBlocks();
+    }
+  }, [pageId]);
+
+  useEffect(() => {
+    if (notionBlocks.length !== 0) console.log(notionBlocks);
+  }, [notionBlocks]);
 
   useEffect(() => {
     const getPage = async () => {
@@ -33,6 +66,10 @@ const CustomNotionPage = () => {
       getPage();
     }
   }, [pageId]);
+
+  if (isLoading) {
+    return <p>Loading...</p>; // Render a loading indicator while fetching data
+  }
 
   return (
     <div className="notion">
@@ -58,7 +95,12 @@ const CustomNotionPage = () => {
           </span>
         )}
         <div className="notion-title">{pageName}</div>
-        <NotionSyncBlockWithId pageId={pageId} />
+        <hr className="notion-hr" />
+        <ul style={{ paddingLeft: 0 }}>
+          {notionBlocks.map((block) => {
+            return <NotionBlock key={block.id} block={block} />;
+          })}
+        </ul>
       </main>
       <br></br>
       <br></br>

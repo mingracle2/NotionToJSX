@@ -1,6 +1,5 @@
 import { getNotionBlocks } from "./getNotionBlocks";
-import { SyncNotionBlockDoc } from "@/src/components/blocks/NotionBlock";
-import { NotionBasicBlockDoc } from "@/type/notion.type";
+import { NotionBasicBlockDoc, SyncNotionBlockDoc } from "@/type/notion.type";
 
 interface ConstructNotionSyncBlocksProps {
   pageId: string;

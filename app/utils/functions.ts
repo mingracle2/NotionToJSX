@@ -15,7 +15,28 @@ export const addColorAndCodeClass = (
     className = classNames(className, "notion-" + text.annotations.color);
   else if (color !== "default")
     className = classNames(className, "notion-" + color);
-  else if (text.href) className = classNames(className, "notion-gray");
+  if (
+    color !== "blue" &&
+    color !== "brown" &&
+    color !== "gray" &&
+    color !== "green" &&
+    color !== "orange" &&
+    color !== "pink" &&
+    color !== "purple" &&
+    color !== "red" &&
+    color !== "yellow" &&
+    text.annotations.color !== "blue" &&
+    text.annotations.color !== "brown" &&
+    text.annotations.color !== "gray" &&
+    text.annotations.color !== "green" &&
+    text.annotations.color !== "orange" &&
+    text.annotations.color !== "pink" &&
+    text.annotations.color !== "purple" &&
+    text.annotations.color !== "red" &&
+    text.annotations.color !== "yellow" &&
+    text.href
+  )
+    className = classNames(className, "notion-gray");
   return className;
 };
 

@@ -23,10 +23,12 @@ const NotionBookmarkBlock = ({
   fetch(`${window.location.origin}/api/notion/meta?url=${block.bookmark.url}`)
     .then((response) => response.json())
     .then((result) => {
-      setLink(result.ogUrl);
-      result.ogTitle ? setTitle(result.ogTitle) : setTitle(result.ogUrl);
+      setLink(result.ogUrl ? result.ogUrl : result.requestUrl);
+      result.ogTitle
+        ? setTitle(result.ogTitle)
+        : setTitle(result.ogUrl ? result.ogUrl : result.requestUrl);
       setDescription(result.ogDescription);
-      setImage(result.ogImage.url);
+      setImage(result.ogImage?.url);
     });
 
   return (

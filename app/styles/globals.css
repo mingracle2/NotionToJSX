@@ -450,7 +450,7 @@ img.notion-page-icon {
   display: none;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 30px) {
   .notion-bookmark-image {
     display: none;
   }
@@ -695,6 +695,30 @@ ul {
   padding-left: 20px;
 }
 
+ul > li {
+  list-style: disc;
+}
+
+ul ul {
+  list-style: circle;
+}
+
+ul ul ul {
+  list-style: square;
+}
+
+ul ul ul ul {
+  list-style: disc;
+}
+
+ul ul ul ul ul {
+  list-style: circle;
+}
+
+ul ul ul ul ul ul {
+  list-style: square;
+}
+
 summary {
   display: block;
   padding-left: 1rem;
@@ -728,14 +752,14 @@ details summary::-webkit-details-marker {
 }
 
 .notion-simple-table {
-  border: 1px solid rgba(55, 53, 47, 0.024);
+  border: 1px solid rgba(55, 53, 47, 0.15);
   border-collapse: collapse;
   border-spacing: 0;
   font-size: 14px;
 }
 
 .notion-simple-table td {
-  border: 1px solid rgba(55, 53, 47, 0.024);
+  border: 1px solid rgba(55, 53, 47, 0.15);
   padding: 8px 8px;
   white-space: pre-wrap;
 }
