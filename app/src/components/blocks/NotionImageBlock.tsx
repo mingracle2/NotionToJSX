@@ -9,28 +9,69 @@ import {
   classNames,
 } from "@/utils/functions";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface NotionImageBlockProps {
   className?: string;
   block: NotionImageBlockDoc;
 }
 
+interface ImageSize {
+  width: number;
+  height: number;
+}
+
 const NotionImageBlock = ({ className, block }: NotionImageBlockProps) => {
-  const getImageUrl = () => {
-    // block.image.type === "file"
-    //   ? console.log(block.image.file?.url)
-    //   : console.log(block.image.external?.url);
-    return block.image.file
-      ? block.image.file.url
-      : block.image.external
-      ? block.image.external.url
-      : "";
-  };
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageSize, setImageSize] = useState<ImageSize | null>(null);
+
+  useEffect(() => {
+    if (block) {
+      const rawUrl = block.image.file
+        ? block.image.file.url
+        : block.image.external
+        ? block.image.external.url
+        : "";
+      setImageUrl(rawUrl);
+    }
+  }, [block]);
+
+  useEffect(() => {
+    if (imageUrl) {
+      const getImageSize = async () => {
+        try {
+          const img = document.createElement("img");
+          img.src = imageUrl;
+
+          img.onload = () => {
+            setImageSize({ width: img.width, height: img.height });
+          };
+
+          img.onerror = (error) => {
+            console.error("Error loading image:", error);
+          };
+        } catch (error) {
+          console.error("Error loading image:", error);
+        }
+      };
+
+      getImageSize();
+    }
+  }, [imageUrl]);
 
   return (
     <div>
       <figure className="notion-asset-wrapper">
-        <img src={getImageUrl()} />
+        {imageUrl && imageSize && (
+          <Image
+            src={imageUrl}
+            // className="w-full h-auto"
+            width={imageSize.width}
+            height={imageSize.height}
+            alt="Description of the image"
+            style={{ height: "auto" }}
+          />
+        )}
       </figure>
       {block.image.caption.length !== 0 && (
         <figcaption>
