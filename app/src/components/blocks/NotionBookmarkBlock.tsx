@@ -1,10 +1,6 @@
-import {
-  NotionBookmarkBlockDoc,
-  NotionImageBlockDoc,
-} from "@/type/notion.type";
+import { NotionBookmarkBlockDoc } from "@/type/notion.type";
 import { classNames } from "@/utils/functions";
 import { useState } from "react";
-import InitialBlock from "./InitialBlock";
 
 interface NotionBookmarkBlockProps {
   className?: string;

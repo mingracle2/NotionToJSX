@@ -1,7 +1,7 @@
 import {
-  BlockTypes,
   NotionBasicBlockDoc,
   NotionRichText,
+  SyncNotionBlockDoc,
 } from "@/type/notion.type";
 import {
   addColorAndCodeClass,
@@ -11,22 +11,22 @@ import {
 
 interface InitialBlockProps {
   className: string;
-  block: NotionBasicBlockDoc;
+  block: NotionBasicBlockDoc | SyncNotionBlockDoc;
 }
 
 const InitialBlock = ({ className, block }: InitialBlockProps) => {
   return (
     <div>
       {block[block.type].rich_text.length === 0 ? (
-        <br></br>
+        <br />
       ) : (
         <pre
           key={block.id}
           style={{ whiteSpace: "pre-wrap" }}
           className={classNames(
+            "notion",
             addColorClass(block[block.type].color),
-            className,
-            "notion"
+            className
           )}
         >
           {block[block.type].rich_text.map(
@@ -50,6 +50,7 @@ const InitialBlock = ({ className, block }: InitialBlockProps) => {
                       ? { textDecoration: "line-through" }
                       : {}),
                     ...(text.href ? { opacity: "70%" } : {}),
+                    ...(text.annotations.code ? {} : { margin: "-3px -2px" }),
                   }}
                   dangerouslySetInnerHTML={{ __html: brString }}
                 ></a>

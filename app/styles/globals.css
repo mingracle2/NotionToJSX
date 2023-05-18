@@ -10,7 +10,7 @@
 .notion > *,
 .notion-page > *,
 .notion-column > * {
-  padding: 3px 0px;
+  padding: 3px 2px;
 }
 
 .notion * {
@@ -146,7 +146,10 @@
 }
 
 .notion-page {
-  padding: 0;
+  /* padding: 0;
+   */
+  padding-top: 3px;
+  padding-bottom: 3px;
   margin: 0 auto;
   max-width: 708px;
   width: 100%;
@@ -513,7 +516,7 @@ img.notion-page-icon {
   outline: none;
 }
 .notion-toggle > div {
-  margin-left: 1.1em;
+  margin-left: 20px;
 }
 
 .notion-h1 .notion-toggle > summary {
@@ -684,15 +687,13 @@ img.notion-nav-icon {
 }
 
 li {
-  margin-left: 3px;
-  list-style-position: inside;
+  margin-left: 25px;
   padding-top: 3px;
   padding-bottom: 3px;
-  text-indent: 5px;
 }
 
 ul {
-  padding-left: 20px;
+  padding-left: 25px;
 }
 
 ul > li {
@@ -756,6 +757,8 @@ details summary::-webkit-details-marker {
   border-collapse: collapse;
   border-spacing: 0;
   font-size: 14px;
+  margin-top: 8px;
+  margin-bottom: 18px;
 }
 
 .notion-simple-table td {

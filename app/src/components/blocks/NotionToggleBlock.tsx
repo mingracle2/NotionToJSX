@@ -1,5 +1,5 @@
-import { NotionToggleBlockDoc, NotionRichText } from "@/type/notion.type";
-import { addColorAndCodeClass, classNames } from "@/utils/functions";
+import { NotionToggleBlockDoc } from "@/type/notion.type";
+import { classNames } from "@/utils/functions";
 import InitialBlock from "./InitialBlock";
 
 interface NotionToggleBlockProps {
@@ -8,11 +8,7 @@ interface NotionToggleBlockProps {
 }
 
 const NotionToggleBlock = ({ className, block }: NotionToggleBlockProps) => {
-  return (
-    <div>
-      <InitialBlock className={classNames("", className)} block={block} />
-    </div>
-  );
+  return <InitialBlock className={classNames("", className)} block={block} />;
 };
 
 export default NotionToggleBlock;

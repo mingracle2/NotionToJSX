@@ -37,93 +37,72 @@ export const getNotionBlocks = async (targetId: string) => {
   ).json();
 
   const notionBlockList: NotionBasicBlockDoc[] = [];
-  blockResponse.results.map((result: NotionBasicBlockDoc, index: Number) => {
+  blockResponse.results.map((result: NotionBasicBlockDoc) => {
     const blockType: BlockTypes = result.type;
     // console.log(result.id + " " + blockType);
     switch (blockType) {
       case BlockTypes.paragraph:
-        const paragraphBlock = result as NotionParagraphBlockDoc;
-        notionBlockList.push(paragraphBlock);
+        notionBlockList.push(result as NotionParagraphBlockDoc);
         break;
       case BlockTypes.quote:
-        const quoteBlock = result as NotionQuoteBlockDoc;
-        notionBlockList.push(quoteBlock);
+        notionBlockList.push(result as NotionQuoteBlockDoc);
         break;
       case BlockTypes.bulleted_list_item:
-        const bulletedListItemBlock = result as NotionBulletedListItemBlockDoc;
-        notionBlockList.push(bulletedListItemBlock);
+        notionBlockList.push(result as NotionBulletedListItemBlockDoc);
         break;
       case BlockTypes.numbered_list_item:
-        const numberedListItemBlock = result as NotionNumberedListItemBlockDoc;
-        notionBlockList.push(numberedListItemBlock);
+        notionBlockList.push(result as NotionNumberedListItemBlockDoc);
         break;
       case BlockTypes.toggle:
-        const toggleBlock = result as NotionToggleBlockDoc;
-        notionBlockList.push(toggleBlock);
+        notionBlockList.push(result as NotionToggleBlockDoc);
         break;
       case BlockTypes.heading_1:
-        const heading1Block = result as NotionHeading1BlockDoc;
-        notionBlockList.push(heading1Block);
+        notionBlockList.push(result as NotionHeading1BlockDoc);
         break;
       case BlockTypes.heading_2:
-        const heading2Block = result as NotionHeading2BlockDoc;
-        notionBlockList.push(heading2Block);
+        notionBlockList.push(result as NotionHeading2BlockDoc);
         break;
       case BlockTypes.heading_3:
-        const heading3Block = result as NotionHeading3BlockDoc;
-        notionBlockList.push(heading3Block);
+        notionBlockList.push(result as NotionHeading3BlockDoc);
         break;
       case BlockTypes.to_do:
-        const todoBlock = result as NotionTodoBlockDoc;
-        notionBlockList.push(todoBlock);
+        notionBlockList.push(result as NotionTodoBlockDoc);
         break;
       case BlockTypes.code:
-        const codeBlock = result as NotionCodeBlockDoc;
-        notionBlockList.push(codeBlock);
+        notionBlockList.push(result as NotionCodeBlockDoc);
         break;
       case BlockTypes.callout:
-        const calloutBlock = result as NotionCalloutBlockDoc;
-        notionBlockList.push(calloutBlock);
+        notionBlockList.push(result as NotionCalloutBlockDoc);
         break;
       case BlockTypes.divider:
-        const dividerBlock = result as NotionDividerBlockDoc;
-        notionBlockList.push(dividerBlock);
+        notionBlockList.push(result as NotionDividerBlockDoc);
         break;
       case BlockTypes.image:
-        const imageBlock = result as NotionImageBlockDoc;
-        notionBlockList.push(imageBlock);
+        notionBlockList.push(result as NotionImageBlockDoc);
         break;
       case BlockTypes.video:
-        const videoBlock = result as NotionVideoBlockDoc;
-        notionBlockList.push(videoBlock);
+        notionBlockList.push(result as NotionVideoBlockDoc);
         break;
       case BlockTypes.embed:
-        const embedBlock = result as NotionEmbedBlockDoc;
-        notionBlockList.push(embedBlock);
+        notionBlockList.push(result as NotionEmbedBlockDoc);
         break;
       case BlockTypes.column_list:
-        const columnListBlock = result as NotionColumnListBlockDoc;
-        notionBlockList.push(columnListBlock);
+        notionBlockList.push(result as NotionColumnListBlockDoc);
         break;
       case BlockTypes.column:
-        const columnBlock = result as NotionColumnBlockDoc;
-        notionBlockList.push(columnBlock);
+        notionBlockList.push(result as NotionColumnBlockDoc);
         break;
       case BlockTypes.bookmark:
-        const bookmarkBlock = result as NotionBookmarkBlockDoc;
-        notionBlockList.push(bookmarkBlock);
+        notionBlockList.push(result as NotionBookmarkBlockDoc);
         break;
       case BlockTypes.link_preview:
-        const linkPreviewBlock = result as NotionLinkPreviewBlockDoc;
-        notionBlockList.push(linkPreviewBlock);
+        notionBlockList.push(result as NotionLinkPreviewBlockDoc);
         break;
       case BlockTypes.table:
-        const tableBlock = result as NotionTableBlockDoc;
-        notionBlockList.push(tableBlock);
+        notionBlockList.push(result as NotionTableBlockDoc);
         break;
       case BlockTypes.table_row:
-        const tableRowBlock = result as NotionTableRowBlockDoc;
-        notionBlockList.push(tableRowBlock);
+        notionBlockList.push(result as NotionTableRowBlockDoc);
         break;
       default:
     }

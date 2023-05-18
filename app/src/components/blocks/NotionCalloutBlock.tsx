@@ -1,9 +1,5 @@
-import { NotionCalloutBlockDoc, NotionRichText } from "@/type/notion.type";
-import {
-  addColorAndCodeClass,
-  addColorClass,
-  classNames,
-} from "@/utils/functions";
+import { NotionCalloutBlockDoc } from "@/type/notion.type";
+import { classNames } from "@/utils/functions";
 import InitialBlock from "./InitialBlock";
 
 interface NotionCalloutBlockProps {
@@ -13,38 +9,14 @@ interface NotionCalloutBlockProps {
 
 const NotionCalloutBlock = ({ className, block }: NotionCalloutBlockProps) => {
   return (
-    <div>
-      <span className={classNames("notion-page-icon", "notion-emoji")}>
+    <div style={{ display: "flex" }}>
+      <div className={classNames("notion-page-icon", "notion-emoji")}>
         {block?.[block.type].icon.emoji}
-      </span>
-      <span key={block.id} className="notion-callout-text">
-        {block[block.type].rich_text.map(
-          (text: NotionRichText, index: number) => {
-            return (
-              <a
-                key={text.plain_text + block.id + index}
-                href={text.href}
-                className={classNames(
-                  addColorAndCodeClass(text, block[block.type].color)
-                )}
-                style={{
-                  ...(text.annotations.bold ? { fontWeight: "bold" } : {}),
-                  ...(text.annotations.italic ? { fontStyle: "italic" } : {}),
-                  ...(text.annotations.underline
-                    ? { textDecoration: "underline" }
-                    : {}),
-                  ...(text.annotations.strikethrough
-                    ? { textDecoration: "line-through" }
-                    : {}),
-                  ...(text.href ? { opacity: "70%" } : {}),
-                }}
-              >
-                {text.plain_text}
-              </a>
-            );
-          }
-        )}
-      </span>
+      </div>
+      <InitialBlock
+        className={classNames("notion-callout-text", className)}
+        block={block}
+      />
     </div>
   );
 };

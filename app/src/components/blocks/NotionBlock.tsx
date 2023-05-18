@@ -1,8 +1,6 @@
 import {
   BlockTypes,
   NotionBasicBlockDoc,
-  NotionRichText,
-  NotionTableRowBlockDoc,
   SyncNotionBlockDoc,
 } from "@/type/notion.type";
 import { getNotionBlocks } from "@/utils/getNotionBlocks";
@@ -23,13 +21,9 @@ import NotionEmbedBlock from "./NotionEmbedBlock";
 import NotionUlBlock from "./NotionUlBlock";
 import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
-import {
-  addColorAndCodeClass,
-  addColorClass,
-  classNames,
-} from "@/utils/functions";
-import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 import NotionTableRowBlock from "./NotionTableRowBlock";
+import { addColorClass, classNames } from "@/utils/functions";
+import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 
 const renderBlock = (block: any) => {
   switch (block.type) {
@@ -38,7 +32,6 @@ const renderBlock = (block: any) => {
     case BlockTypes.quote:
       return <NotionQuoteBlock key={block.id} block={block} />;
     case BlockTypes.bulleted_list_item:
-      return <NotionUlBlock key={block.id} block={block} />;
     case BlockTypes.numbered_list_item:
       return <NotionUlBlock key={block.id} block={block} />;
     case BlockTypes.toggle:
@@ -83,47 +76,37 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
     []
   );
   const [numOfChildrenBlocks, setNumOfChildrenBlocks] = useState(0);
-  const [widthOfChildrenColumns, setWidthOfChildrenColumns] = useState("");
-  const [needToggle, setNeedToggle] = useState(false);
-  const [isColumnList, setIsColumnList] = useState(false);
-  const [isColumn, setIsColumn] = useState(false);
-  const [isCallout, setIsCallout] = useState(false);
-  const [isTable, setIsTable] = useState(false);
-  const [isUl, setIsUl] = useState(false);
 
   const fetchChildren = useCallback(async (blockId: string) => {
     const blocks = await getNotionBlocks(blockId);
-    // console.log({ blocks });
     setChildrenBlocks(() => blocks);
-    setNumOfChildrenBlocks(blocks.length);
-    setWidthOfChildrenColumns(
-      ((100 * (1 - 0.35 * (blocks.length - 1))) / numOfChildrenBlocks).toFixed(
-        0
-      ) + "%"
-    );
+    setNumOfChildrenBlocks(() => blocks.length);
   }, []);
 
-  useEffect(() => {
-    if (block) {
-      setNeedToggle(
-        block.type === BlockTypes.toggle ||
-          ((block?.type === BlockTypes.heading_1 ||
-            block?.type === BlockTypes.heading_2 ||
-            block?.type === BlockTypes.heading_3) &&
-            block[block.type].is_toggleable === true)
-      );
-      setIsColumnList(block.type === BlockTypes.column_list);
-      setIsColumn(block.type === BlockTypes.column);
-      setIsCallout(block.type === BlockTypes.callout);
-      setIsTable(block.type === BlockTypes.table);
-      setIsUl(
-        block?.type === BlockTypes.bulleted_list_item ||
-          block?.type === BlockTypes.numbered_list_item
-      );
+  const needToggle: boolean =
+    block?.type === BlockTypes.toggle ||
+    ((block?.type === BlockTypes.heading_1 ||
+      block?.type === BlockTypes.heading_2 ||
+      block?.type === BlockTypes.heading_3) &&
+      block[block.type].is_toggleable === true);
 
-      if (block.has_children) {
-        fetchChildren(block.id);
-      }
+  const isColumnList: boolean = block?.type === BlockTypes.column_list;
+  const isColumn: boolean = block?.type === BlockTypes.column;
+  const isCallout: boolean = block?.type === BlockTypes.callout;
+  const isTable: boolean = block?.type === BlockTypes.table;
+  const isUl: boolean =
+    block?.type === BlockTypes.bulleted_list_item ||
+    block?.type === BlockTypes.numbered_list_item;
+
+  const widthOfChildrenColumns =
+    (
+      (100 * (1 - 0.35 * (numOfChildrenBlocks - 1))) /
+      numOfChildrenBlocks
+    ).toFixed(0) + "%";
+
+  useEffect(() => {
+    if (block && block.has_children) {
+      fetchChildren(block.id);
     }
   }, [block]);
 
@@ -133,81 +116,69 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
     }
   }, [pageId]);
 
-  return (
+  return block ? (
     <span
       onClick={(e) => {
         e.stopPropagation();
-        console.log(block?.id, block?.type, { block });
+        console.log(block.id, block.type, { block });
       }}
     >
       {needToggle ? (
         <details className="notion-toggle">
           <summary style={{ marginLeft: "5px" }}>
-            <span>{block && renderBlock(block)}</span>
+            <span>{renderBlock(block)}</span>
           </summary>
-          <ul>
+          <div>
+            {childrenBlocks.map((childBlock: NotionBasicBlockDoc) => {
+              return (
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+              );
+            })}
+          </div>
+        </details>
+      ) : isColumnList ? (
+        <div className="notion-row flex space-x-4">
+          {childrenBlocks.map(
+            (childBlock: NotionBasicBlockDoc, index: number) => {
+              return (
+                <div
+                  key={childBlock.id + index}
+                  style={{
+                    ...(index === 0 ? {} : { marginLeft: "15px" }),
+                    flex: 1,
+                    width: widthOfChildrenColumns,
+                  }}
+                >
+                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+                </div>
+              );
+            }
+          )}
+        </div>
+      ) : isColumn ? (
+        <div className="notion-column" style={{ flex: 1, width: "100%" }}>
+          {childrenBlocks.map((childBlock) => {
+            return <NotionAsyncBlock key={childBlock.id} block={childBlock} />;
+          })}
+        </div>
+      ) : isCallout ? (
+        <div
+          className={classNames(
+            addColorClass(block[block.type].color),
+            "notion-callout"
+          )}
+        >
+          {renderBlock(block)}
+          <div style={{ paddingLeft: "34px" }}>
             {childrenBlocks.map((childBlock) => {
               return (
                 <NotionAsyncBlock key={childBlock.id} block={childBlock} />
               );
             })}
-          </ul>
-        </details>
-      ) : isColumnList ? (
-        <div className="notion-row flex space-x-4">
-          {childrenBlocks.map((childBlock, index) => {
-            return (
-              <div
-                key={childBlock.id + index}
-                style={{
-                  ...(index === numOfChildrenBlocks - 1
-                    ? {}
-                    : { marginRight: "15px" }),
-                  flex: 1,
-                  width: widthOfChildrenColumns,
-                }}
-              >
-                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
-              </div>
-            );
-          })}
-        </div>
-      ) : isColumn ? (
-        <>
-          <div className="notion-column">
-            <ul style={{ flex: 1, width: "100%" }}>
-              {childrenBlocks.map((childBlock) => {
-                return (
-                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
-                );
-              })}
-            </ul>
-          </div>
-        </>
-      ) : isCallout ? (
-        <div
-          className={classNames(
-            addColorClass(block?.[block.type].color),
-            "notion-callout"
-          )}
-        >
-          {block && renderBlock(block)}
-          {/* Render Children */}
-          <div>
-            <ul style={{ paddingLeft: "35px" }}>
-              {childrenBlocks.map((childBlock) => {
-                return (
-                  <NotionAsyncBlock key={childBlock.id} block={childBlock} />
-                );
-              })}
-            </ul>
           </div>
         </div>
       ) : isTable ? (
-        <table
-          className={classNames("notion-simple-table")}
-          style={{ marginTop: "10px", marginBottom: "10px" }}
-        >
+        <table className={classNames("notion-simple-table")}>
           <tbody>
             {childrenBlocks.map(
               (childBlock: NotionBasicBlockDoc, index: number) => {
@@ -215,8 +186,8 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
                   <NotionTableRowBlock
                     key={childBlock.id}
                     block={childBlock}
-                    has_column_header={block?.table.has_column_header}
-                    has_row_header={block?.table.has_row_header}
+                    has_column_header={block.table.has_column_header}
+                    has_row_header={block.table.has_row_header}
                     is_first_row={index === 0}
                   />
                 );
@@ -225,60 +196,10 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
           </tbody>
         </table>
       ) : isUl ? (
-        <li key={block?.id} className={classNames("")}>
-          <span style={{ marginLeft: "-7px" }}>
-            {block ? (
-              block[block.type].rich_text.map(
-                (text: NotionRichText, index: number) => {
-                  return (
-                    <a
-                      key={text.plain_text + block.id + index}
-                      href={text.href}
-                      className={addColorAndCodeClass(
-                        text,
-                        block[block.type].color
-                      )}
-                      style={{
-                        ...(text.annotations.bold
-                          ? { fontWeight: "bold" }
-                          : {}),
-                        ...(text.annotations.italic
-                          ? { fontStyle: "italic" }
-                          : {}),
-                        ...(text.annotations.underline
-                          ? { textDecoration: "underline" }
-                          : {}),
-                        ...(text.annotations.strikethrough
-                          ? { textDecoration: "line-through" }
-                          : {}),
-                        ...(text.href ? { opacity: "70%" } : {}),
-                        // marginLeft: "-7px",
-                      }}
-                    >
-                      {text.plain_text}
-                    </a>
-                  );
-                }
-              )
-            ) : (
-              <></>
-            )}
-          </span>
-          <ul>
-            {childrenBlocks.map((childBlock) => {
-              return (
-                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
-              );
-            })}
-          </ul>
-        </li>
-      ) : block ? (
         <>
-          {/* Render Block */}
-          {block && renderBlock(block)}
-          {/* Render Children */}
+          {renderBlock(block)}
           <ul>
-            {childrenBlocks.map((childBlock) => {
+            {childrenBlocks.map((childBlock: NotionBasicBlockDoc) => {
               return (
                 <NotionAsyncBlock key={childBlock.id} block={childBlock} />
               );
@@ -287,12 +208,27 @@ export const NotionAsyncBlock = ({ pageId, block }: NotionAsyncBlockProps) => {
         </>
       ) : (
         <>
-          {childrenBlocks.map((childBlock) => {
-            return <NotionAsyncBlock key={childBlock.id} block={childBlock} />;
-          })}
+          {/* Render Block */}
+          {renderBlock(block)}
+          {/* Render Children */}
+          <div style={{ marginLeft: "25px" }}>
+            {childrenBlocks.map((childBlock) => {
+              return (
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+              );
+            })}
+          </div>
         </>
       )}
     </span>
+  ) : pageId ? (
+    <>
+      {childrenBlocks.map((childBlock) => {
+        return <NotionAsyncBlock key={childBlock.id} block={childBlock} />;
+      })}
+    </>
+  ) : (
+    <></>
   );
 };
 
@@ -303,18 +239,40 @@ interface NotionSyncBlockProps {
 
 /* TODO. SSR을 위해 모든 children을 재귀로 호출하여 결합한 JSON을 만들어 아래 Component에 주입합니다. */
 export const NotionSyncBlock = ({ pageId, block }: NotionSyncBlockProps) => {
-  // console.log(block.id);
-
   const [notionBlocks, setNotionBlocks] = useState<SyncNotionBlockDoc[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [numOfChildrenBlocks, setNumOfChildrenBlocks] = useState(0);
-  const [widthOfChildrenColumns, setWidthOfChildrenColumns] = useState("");
-  const [needToggle, setNeedToggle] = useState(false);
-  const [isColumnList, setIsColumnList] = useState(false);
-  const [isColumn, setIsColumn] = useState(false);
-  const [isCallout, setIsCallout] = useState(false);
-  const [isTable, setIsTable] = useState(false);
-  const [isUl, setIsUl] = useState(false);
+
+  useEffect(() => {
+    if (notionBlocks.length !== 0) console.log(notionBlocks);
+  }, [notionBlocks]);
+
+  const needToggle: boolean =
+    block?.type === BlockTypes.toggle ||
+    ((block?.type === BlockTypes.heading_1 ||
+      block?.type === BlockTypes.heading_2 ||
+      block?.type === BlockTypes.heading_3) &&
+      block[block.type].is_toggleable === true);
+
+  const isColumnList: boolean = block?.type === BlockTypes.column_list;
+  const isColumn: boolean = block?.type === BlockTypes.column;
+  const isCallout: boolean = block?.type === BlockTypes.callout;
+  const isTable: boolean = block?.type === BlockTypes.table;
+  const isUl: boolean =
+    block?.type === BlockTypes.bulleted_list_item ||
+    block?.type === BlockTypes.numbered_list_item;
+
+  const widthOfChildrenColumns =
+    (
+      (100 * (1 - 0.35 * (numOfChildrenBlocks - 1))) /
+      numOfChildrenBlocks
+    ).toFixed(0) + "%";
+
+  useEffect(() => {
+    if (block) {
+      setNumOfChildrenBlocks(block.childrenBlocks.length);
+    }
+  }, [block]);
 
   useEffect(() => {
     if (pageId) {
@@ -336,116 +294,72 @@ export const NotionSyncBlock = ({ pageId, block }: NotionSyncBlockProps) => {
     }
   }, [pageId]);
 
-  useEffect(() => {
-    if (notionBlocks.length !== 0) console.log(notionBlocks);
-  }, [notionBlocks]);
-
-  useEffect(() => {
-    if (block) {
-      setNeedToggle(
-        block.type === BlockTypes.toggle ||
-          ((block?.type === BlockTypes.heading_1 ||
-            block?.type === BlockTypes.heading_2 ||
-            block?.type === BlockTypes.heading_3) &&
-            block[block.type].is_toggleable === true)
-      );
-      setIsColumnList(block.type === BlockTypes.column_list);
-      setIsColumn(block.type === BlockTypes.column);
-      setIsCallout(block.type === BlockTypes.callout);
-      setIsTable(block.type === BlockTypes.table);
-      setIsUl(
-        block?.type === BlockTypes.bulleted_list_item ||
-          block?.type === BlockTypes.numbered_list_item
-      );
-      setNumOfChildrenBlocks(block.childrenBlocks.length);
-      setWidthOfChildrenColumns(
-        (
-          (100 * (1 - 0.35 * (block.childrenBlocks.length - 1))) /
-          numOfChildrenBlocks
-        ).toFixed(0) + "%"
-      );
-    }
-  }, [block]);
-
   if (isLoading && pageId) {
     return <p>Loading...</p>; // Render a loading indicator while fetching data
   }
 
-  return (
+  return block ? (
     <span
       onClick={(e) => {
         e.stopPropagation();
-        console.log(block?.id, block?.type, { block });
+        console.log(block.id, block.type, { block });
       }}
     >
       {needToggle ? (
         <details className="notion-toggle">
           <summary style={{ marginLeft: "5px" }}>
-            <span>{block && renderBlock(block)}</span>
+            <span>{renderBlock(block)}</span>
           </summary>
-          <ul>
-            {block?.childrenBlocks.map((childBlock) => {
+          <div>
+            {block.childrenBlocks.map((childBlock: SyncNotionBlockDoc) => {
               return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
             })}
-          </ul>
+          </div>
         </details>
       ) : isColumnList ? (
         <div className="notion-row flex space-x-4">
-          {block?.childrenBlocks.map((childBlock, index) => {
-            return (
-              <div
-                key={childBlock.id + index}
-                style={{
-                  ...(index === numOfChildrenBlocks - 1
-                    ? {}
-                    : { marginRight: "15px" }),
-                  flex: 1,
-                  width: widthOfChildrenColumns,
-                }}
-              >
-                <NotionSyncBlock key={childBlock.id} block={childBlock} />
-              </div>
-            );
-          })}
+          {block.childrenBlocks.map(
+            (childBlock: SyncNotionBlockDoc, index: number) => {
+              return (
+                <div
+                  key={childBlock.id + index}
+                  style={{
+                    ...(index === 0 ? {} : { marginLeft: "15px" }),
+                    flex: 1,
+                    width: widthOfChildrenColumns,
+                  }}
+                >
+                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
+                </div>
+              );
+            }
+          )}
         </div>
       ) : isColumn ? (
-        <>
-          <div className="notion-column">
-            <ul style={{ flex: 1, width: "100%" }}>
-              {block?.childrenBlocks.map((childBlock) => {
-                return (
-                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
-                );
-              })}
-            </ul>
-          </div>
-        </>
+        <div className="notion-column" style={{ flex: 1, width: "100%" }}>
+          {block.childrenBlocks.map((childBlock) => {
+            return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+          })}
+        </div>
       ) : isCallout ? (
         <div
           className={classNames(
-            addColorClass(block?.[block.type].color),
+            addColorClass(block[block.type].color),
             "notion-callout"
           )}
         >
-          {block && renderBlock(block)}
+          {renderBlock(block)}
           {/* Render Children */}
-          <div>
-            <ul style={{ paddingLeft: "35px" }}>
-              {block?.childrenBlocks.map((childBlock) => {
-                return (
-                  <NotionSyncBlock key={childBlock.id} block={childBlock} />
-                );
-              })}
-            </ul>
+          <div style={{ paddingLeft: "34px" }}>
+            {block.childrenBlocks.map((childBlock) => {
+              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+            })}
           </div>
         </div>
       ) : isTable ? (
-        <table
-          className={classNames("notion-simple-table")}
-          style={{ marginTop: "10px", marginBottom: "10px" }}
-        >
+        <table className={classNames("notion-simple-table")}>
           <tbody>
-            {block?.childrenBlocks.map(
+            {block.childrenBlocks.map(
               (childBlock: NotionBasicBlockDoc, index: number) => {
                 return (
                   <NotionTableRowBlock
@@ -461,70 +375,37 @@ export const NotionSyncBlock = ({ pageId, block }: NotionSyncBlockProps) => {
           </tbody>
         </table>
       ) : isUl ? (
-        <li key={block?.id} className={classNames("")}>
-          <span style={{ marginLeft: "-7px" }}>
-            {block ? (
-              block[block.type].rich_text.map(
-                (text: NotionRichText, index: number) => {
-                  return (
-                    <a
-                      key={text.plain_text + block.id + index}
-                      href={text.href}
-                      className={addColorAndCodeClass(
-                        text,
-                        block[block.type].color
-                      )}
-                      style={{
-                        ...(text.annotations.bold
-                          ? { fontWeight: "bold" }
-                          : {}),
-                        ...(text.annotations.italic
-                          ? { fontStyle: "italic" }
-                          : {}),
-                        ...(text.annotations.underline
-                          ? { textDecoration: "underline" }
-                          : {}),
-                        ...(text.annotations.strikethrough
-                          ? { textDecoration: "line-through" }
-                          : {}),
-                        ...(text.href ? { opacity: "70%" } : {}),
-                        // marginLeft: "-7px",
-                      }}
-                    >
-                      {text.plain_text}
-                    </a>
-                  );
-                }
-              )
-            ) : (
-              <></>
-            )}
-          </span>
-          <ul>
-            {block?.childrenBlocks.map((childBlock) => {
-              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
-            })}
-          </ul>
-        </li>
-      ) : block ? (
         <>
-          {/* Render Block */}
-          {block && renderBlock(block)}
-          {/* Render Children */}
+          {renderBlock(block)}
           <ul>
-            {block.childrenBlocks.map((childBlock) => {
-              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+            {block.childrenBlocks.map((childBlock: SyncNotionBlockDoc) => {
+              return (
+                <NotionAsyncBlock key={childBlock.id} block={childBlock} />
+              );
             })}
           </ul>
         </>
       ) : (
         <>
-          {notionBlocks.map((notionBlock) => {
-            return <NotionSyncBlock key={notionBlock.id} block={notionBlock} />;
-          })}
+          {/* Render Block */}
+          {block && renderBlock(block)}
+          {/* Render Children */}
+          <div style={{ marginLeft: "25px" }}>
+            {block.childrenBlocks.map((childBlock) => {
+              return <NotionSyncBlock key={childBlock.id} block={childBlock} />;
+            })}
+          </div>
         </>
       )}
     </span>
+  ) : pageId ? (
+    <>
+      {notionBlocks.map((notionBlock) => {
+        return <NotionSyncBlock key={notionBlock.id} block={notionBlock} />;
+      })}
+    </>
+  ) : (
+    <></>
   );
 };
 

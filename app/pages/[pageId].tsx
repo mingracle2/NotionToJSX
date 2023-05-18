@@ -1,10 +1,7 @@
-import NotionBlock, {
+import {
   NotionAsyncBlock,
   NotionSyncBlock,
 } from "@/src/components/blocks/NotionBlock";
-import NotionDBlock from "@/src/components/blocks/NotionDBlock";
-import { SyncNotionBlockDoc } from "@/type/notion.type";
-import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useRouter } from "next/router";
@@ -38,7 +35,6 @@ const CustomNotionPage = () => {
     };
     if (pageId) {
       console.log(pageId);
-      console.log(isAsync);
       getPage();
     }
   }, [pageId]);

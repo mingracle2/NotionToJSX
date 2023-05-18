@@ -15,7 +15,12 @@ const NotionVideoBlock = ({ className, block }: NotionVideoBlockProps) => {
   };
   return (
     <figure className="notion-asset-wrapper">
-      <iframe width="100%" height="500" src={getVideoUrl()} />
+      <iframe
+        width="560"
+        height="315"
+        src={getVideoUrl()}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      ></iframe>
     </figure>
   );
 };

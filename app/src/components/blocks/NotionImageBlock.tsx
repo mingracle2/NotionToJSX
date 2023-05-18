@@ -10,6 +10,7 @@ import {
 } from "@/utils/functions";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import InitialBlock from "./InitialBlock";
 
 interface NotionImageBlockProps {
   className?: string;
