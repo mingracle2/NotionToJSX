@@ -1,7 +1,4 @@
-import {
-  NotionAsyncBlock,
-  NotionSyncBlock,
-} from "@/src/components/blocks/NotionBlock";
+import { NotionBlock } from "@/src/components/blocks/NotionBlock";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
 import { useRouter } from "next/router";
@@ -65,11 +62,7 @@ const CustomNotionPage = () => {
         <div className="notion-title">{pageName}</div>
         <hr className="notion-hr" />
         <ul style={{ paddingLeft: 0 }}>
-          {isAsync ? (
-            <NotionAsyncBlock pageId={pageId} />
-          ) : (
-            <NotionSyncBlock pageId={pageId} />
-          )}
+          <NotionBlock isAsync={isAsync} pageId={pageId} />
         </ul>
       </main>
       <br></br>
