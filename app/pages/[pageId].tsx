@@ -1,10 +1,20 @@
+import { constructNotionSyncBlocks } from "@/lib/constructNotionSyncBlocks";
 import { NotionBlock } from "@/src/components/blocks/NotionBlock";
+import { SyncNotionBlockDoc } from "@/type/notion.type";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const CustomNotionPage = () => {
+interface CustomNotionPageProps {
+  pageName: string;
+  pageIcon: string;
+  pageCover: string;
+  notionBlockData?: SyncNotionBlockDoc[];
+}
+
+const CustomNotionPage: NextPage<CustomNotionPageProps> = (props) => {
   const router = useRouter();
 
   const [pageName, setPageName] = useState("");
@@ -25,10 +35,9 @@ const CustomNotionPage = () => {
         console.log("올바른 경로로 접속해주세요.");
         return <></>;
       }
-      const [name, icon, cover] = await getNotionPage(pageId);
-      setPageName(name);
-      setPageIcon(icon);
-      setPageCover(cover);
+      setPageName(props.pageName);
+      setPageIcon(props.pageIcon);
+      setPageCover(props.pageCover);
     };
     if (pageId) {
       console.log(pageId);
@@ -62,7 +71,11 @@ const CustomNotionPage = () => {
         <div className="notion-title">{pageName}</div>
         <hr className="notion-hr" />
         <ul style={{ paddingLeft: 0 }}>
-          <NotionBlock isAsync={isAsync} pageId={pageId} />
+          <NotionBlock
+            pageId={pageId}
+            isAsync={isAsync}
+            syncBlocks={props?.notionBlockData}
+          />
         </ul>
       </main>
       <br></br>
@@ -71,5 +84,35 @@ const CustomNotionPage = () => {
     </div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  const pageId: string = context.params.pageId;
+  const isAsync: boolean =
+    typeof context.query.isAsync === "string" &&
+    context.query.isAsync === "true"
+      ? true
+      : false;
+  const [pageName, pageIcon, pageCover] = await getNotionPage(pageId);
+  if (!isAsync) {
+    const notionBlockData: SyncNotionBlockDoc[] =
+      await constructNotionSyncBlocks({ pageId });
+    return {
+      props: {
+        pageName,
+        pageIcon,
+        pageCover,
+        notionBlockData,
+      },
+    };
+  } else {
+    return {
+      props: {
+        pageName,
+        pageIcon,
+        pageCover,
+      },
+    };
+  }
+}
 
 export default CustomNotionPage;

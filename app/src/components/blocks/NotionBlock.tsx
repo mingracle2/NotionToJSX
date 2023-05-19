@@ -3,7 +3,7 @@ import {
   NotionBasicBlockDoc,
   SyncNotionBlockDoc,
 } from "@/type/notion.type";
-import { getNotionBlocks } from "@/utils/getNotionBlocks";
+import { getNotionBlocks } from "@/lib/getNotionBlocks";
 import { useCallback, useEffect, useState } from "react";
 import NotionTodoBlock from "./NotionTodoBlock";
 import NotionPBlock from "./NotionPBlock";
@@ -23,7 +23,7 @@ import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
 import NotionTableRowBlock from "./NotionTableRowBlock";
 import { addColorClass, classNames } from "@/utils/functions";
-import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
+import { constructNotionSyncBlocks } from "@/lib/constructNotionSyncBlocks";
 
 const renderBlock = (block: any) => {
   switch (block.type) {
@@ -69,10 +69,16 @@ interface NotionBlockProps {
   pageId?: string;
   isAsync: boolean;
   block?: NotionBasicBlockDoc | SyncNotionBlockDoc; // 자식 block 들이 포함된 block 입니다.
+  syncBlocks?: SyncNotionBlockDoc[];
 }
 
 /* TODO. SSR을 위해 모든 children을 재귀로 호출하여 결합한 JSON을 만들어 아래 Component에 주입합니다. */
-export const NotionBlock = ({ pageId, isAsync, block }: NotionBlockProps) => {
+export const NotionBlock = ({
+  pageId,
+  isAsync,
+  block,
+  syncBlocks,
+}: NotionBlockProps) => {
   const [childrenBlocks, setChildrenBlocks] = useState<
     NotionBasicBlockDoc[] | SyncNotionBlockDoc[]
   >([]);
@@ -125,32 +131,15 @@ export const NotionBlock = ({ pageId, isAsync, block }: NotionBlockProps) => {
   useEffect(() => {
     if (pageId) {
       if (isAsync) {
-        console.log("pageId");
         fetchChildren(pageId, isAsync);
       } else {
-        setIsLoading(true);
-
-        const start = Date.now();
-        constructNotionSyncBlocks({
-          pageId,
-        })
-          .then((result) => {
-            const end = Date.now();
-            console.log(end - start, "ms");
-            setChildrenBlocks(() => result);
-            setNumOfChildrenBlocks(result.length);
-          })
-          .catch((e) => console.log(e))
-          .finally(() => {
-            setIsLoading(() => false);
-          });
+        if (syncBlocks) {
+          setChildrenBlocks(() => syncBlocks);
+          setNumOfChildrenBlocks(syncBlocks.length);
+        }
       }
     }
   }, [pageId]);
-
-  if (isLoading && pageId && !isAsync) {
-    return <p>Loading...</p>; // Render a loading indicator while fetching data
-  }
 
   return block ? (
     <span

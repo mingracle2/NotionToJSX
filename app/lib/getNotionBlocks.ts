@@ -27,7 +27,7 @@ import {
 export const getNotionBlocks = async (targetId: string) => {
   // Call API and receive response
   const blockResponse = await (
-    await fetch("/api/notion/notionBlockContent", {
+    await fetch("http://localhost:3000/api/notion/notionBlockContent", {
       method: "POST",
       body: JSON.stringify({ value: targetId }),
       headers: {
