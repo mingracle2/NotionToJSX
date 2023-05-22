@@ -2,7 +2,7 @@ import { constructNotionSyncBlocks } from "@/lib/constructNotionSyncBlocks";
 import { NotionBlock } from "@/src/components/blocks/NotionBlock";
 import { SyncNotionBlockDoc } from "@/type/notion.type";
 import { classNames } from "@/utils/functions";
-import { getNotionPage } from "@/utils/getNotionPage";
+import { getNotionPage } from "@/lib/getNotionPage";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -92,6 +92,7 @@ export async function getServerSideProps(context: any) {
     context.query.isAsync === "true"
       ? true
       : false;
+  console.log(pageId);
   const [pageName, pageIcon, pageCover] = await getNotionPage(pageId);
   if (!isAsync) {
     const notionBlockData: SyncNotionBlockDoc[] =

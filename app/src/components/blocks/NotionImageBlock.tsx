@@ -71,6 +71,7 @@ const NotionImageBlock = ({ className, block }: NotionImageBlockProps) => {
             height={imageSize.height}
             alt="Description of the image"
             style={{ height: "auto" }}
+            priority={true}
           />
         )}
       </figure>
