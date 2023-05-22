@@ -8,7 +8,10 @@ interface ConstructNotionSyncBlocksProps {
 export const constructNotionSyncBlocks = async ({
   pageId,
 }: ConstructNotionSyncBlocksProps) => {
-  const initialBlocks: NotionBasicBlockDoc[] = await getNotionBlocks(pageId);
+  const initialBlocks: NotionBasicBlockDoc[] = await getNotionBlocks(
+    pageId,
+    false
+  );
   const updatedBlocks: SyncNotionBlockDoc[] = await Promise.all(
     initialBlocks.map(async (block) => {
       const result = await getChildrenBlocks({ block });
@@ -24,7 +27,10 @@ interface GetChildrenBlocksProps {
 }
 
 const getChildrenBlocks = async ({ block }: GetChildrenBlocksProps) => {
-  const initialBlocks: NotionBasicBlockDoc[] = await getNotionBlocks(block.id);
+  const initialBlocks: NotionBasicBlockDoc[] = await getNotionBlocks(
+    block.id,
+    false
+  );
   const childrenBlocks: SyncNotionBlockDoc[] = await Promise.all(
     initialBlocks.map(async (childBlock) => {
       const result = await getChildrenBlocks({ block: childBlock });

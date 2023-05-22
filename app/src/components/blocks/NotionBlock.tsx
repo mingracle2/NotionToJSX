@@ -88,7 +88,7 @@ export const NotionBlock = ({
   const fetchChildren = useCallback(
     async (blockId: string, isAsync: boolean) => {
       if (isAsync) {
-        const blocks = await getNotionBlocks(blockId);
+        const blocks = await getNotionBlocks(blockId, isAsync);
         setChildrenBlocks(() => blocks);
         setNumOfChildrenBlocks(() => blocks.length);
       } else {
