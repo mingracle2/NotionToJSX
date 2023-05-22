@@ -69,14 +69,19 @@ interface NotionBlockProps {
   pageId?: string;
   isAsync: boolean;
   block?: NotionBasicBlockDoc | SyncNotionBlockDoc; // 자식 block 들이 포함된 block 입니다.
+  syncBlocks?: SyncNotionBlockDoc[];
 }
 
 /* TODO. SSR을 위해 모든 children을 재귀로 호출하여 결합한 JSON을 만들어 아래 Component에 주입합니다. */
-export const NotionBlock = ({ pageId, isAsync, block }: NotionBlockProps) => {
+export const NotionBlock = ({
+  pageId,
+  isAsync,
+  block,
+  syncBlocks,
+}: NotionBlockProps) => {
   const [childrenBlocks, setChildrenBlocks] = useState<
     NotionBasicBlockDoc[] | SyncNotionBlockDoc[]
   >([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [numOfChildrenBlocks, setNumOfChildrenBlocks] = useState(0);
 
   const fetchChildren = useCallback(
@@ -128,29 +133,13 @@ export const NotionBlock = ({ pageId, isAsync, block }: NotionBlockProps) => {
         console.log("pageId");
         fetchChildren(pageId, isAsync);
       } else {
-        setIsLoading(true);
-
-        const start = Date.now();
-        constructNotionSyncBlocks({
-          pageId,
-        })
-          .then((result) => {
-            const end = Date.now();
-            console.log(end - start, "ms");
-            setChildrenBlocks(() => result);
-            setNumOfChildrenBlocks(result.length);
-          })
-          .catch((e) => console.log(e))
-          .finally(() => {
-            setIsLoading(() => false);
-          });
+        if (syncBlocks) {
+          setChildrenBlocks(() => syncBlocks);
+          setNumOfChildrenBlocks(syncBlocks.length);
+        }
       }
     }
   }, [pageId]);
-
-  if (isLoading && pageId && !isAsync) {
-    return <p>Loading...</p>; // Render a loading indicator while fetching data
-  }
 
   return block ? (
     <span

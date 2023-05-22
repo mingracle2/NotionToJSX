@@ -1,13 +1,16 @@
 export const getNotionPage = async (targetId: string) => {
   // Call API and receive response
   const response = await (
-    await fetch("/api/notion/get-page", {
-      method: "POST",
-      body: JSON.stringify({ value: targetId }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    await fetch(
+      "http://notion-to-jsx-git-minki-staticprops-mingracle2.vercel.app/api/notion/get-page",
+      {
+        method: "POST",
+        body: JSON.stringify({ value: targetId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
   ).json();
 
   const pageName = response.results ? response.results[0].title.plain_text : "";

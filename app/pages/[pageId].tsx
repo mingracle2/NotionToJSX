@@ -1,10 +1,21 @@
 import { NotionBlock } from "@/src/components/blocks/NotionBlock";
+import { SyncNotionBlockDoc } from "@/type/notion.type";
+import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
 import { classNames } from "@/utils/functions";
 import { getNotionPage } from "@/utils/getNotionPage";
+import { getPagesFromDatabase } from "@/utils/getPagesFromDatabase";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const CustomNotionPage = () => {
+interface CustomNotionPageProps {
+  pageName: string;
+  pageIcon: string;
+  pageCover: string;
+  notionBlockData: SyncNotionBlockDoc[];
+}
+
+const CustomNotionPage: NextPage<CustomNotionPageProps> = (props) => {
   const router = useRouter();
 
   const [pageName, setPageName] = useState("");
@@ -20,19 +31,11 @@ const CustomNotionPage = () => {
       : false;
 
   useEffect(() => {
-    const getPage = async () => {
-      if (typeof pageId !== "string") {
-        console.log("올바른 경로로 접속해주세요.");
-        return <></>;
-      }
-      const [name, icon, cover] = await getNotionPage(pageId);
-      setPageName(name);
-      setPageIcon(icon);
-      setPageCover(cover);
-    };
     if (pageId) {
       console.log(pageId);
-      getPage();
+      setPageName(props.pageName);
+      setPageIcon(props.pageIcon);
+      setPageCover(props.pageCover);
     }
   }, [pageId]);
 
@@ -62,7 +65,11 @@ const CustomNotionPage = () => {
         <div className="notion-title">{pageName}</div>
         <hr className="notion-hr" />
         <ul style={{ paddingLeft: 0 }}>
-          <NotionBlock isAsync={isAsync} pageId={pageId} />
+          <NotionBlock
+            pageId={pageId}
+            isAsync={isAsync}
+            syncBlocks={props.notionBlockData}
+          />
         </ul>
       </main>
       <br></br>
@@ -71,5 +78,37 @@ const CustomNotionPage = () => {
     </div>
   );
 };
+
+export async function getStaticProps({ params }: any) {
+  if (params.pageId) {
+    const pageId: string = params.pageId;
+    const [pageName, pageIcon, pageCover] = await getNotionPage(pageId);
+    const notionBlockData: SyncNotionBlockDoc[] =
+      await constructNotionSyncBlocks({ pageId });
+    return {
+      props: {
+        pageName,
+        pageIcon,
+        pageCover,
+        notionBlockData,
+      },
+    };
+  }
+}
+
+export async function getStaticPaths() {
+  const pageIds: string[] = await getPagesFromDatabase();
+
+  const paths = pageIds.map((pageId) => ({
+    params: {
+      pageId: pageId,
+    },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+}
 
 export default CustomNotionPage;
