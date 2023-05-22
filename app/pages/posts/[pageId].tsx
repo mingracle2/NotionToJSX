@@ -86,6 +86,10 @@ const CustomNotionPage: NextPage<CustomNotionPageProps> = (props) => {
 };
 
 export async function getServerSideProps(context: any) {
+  context.res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=10, stale-while-revalidate=59"
+  );
   const pageId: string = context.params.pageId;
   const isAsync: boolean =
     typeof context.query.isAsync === "string" &&
