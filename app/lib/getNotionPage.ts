@@ -4,6 +4,7 @@ export const notionIntegrationToken =
   "Bearer secret_6Fa7uOy0Rlygt7aD7WNUX4z0sPtHj7Has4Gsjk3pMsx";
 
 export const getNotionPage = async (targetId: string) => {
+  console.log(targetId);
   // Call API and receive response
   const titleConfig = {
     method: "get",
