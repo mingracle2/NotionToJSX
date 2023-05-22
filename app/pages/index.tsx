@@ -11,7 +11,7 @@ const IndexPage: React.FC = () => {
 
   useEffect(() => {
     if (pageId) {
-      window.open(`/posts/${pageId}?isAsync=${isAsync}`, "_blank");
+      window.open(`/${pageId}?isAsync=${isAsync}`, "_blank");
     }
   }, [click]);
 
