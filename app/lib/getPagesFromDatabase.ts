@@ -21,10 +21,20 @@ export const getPagesFromDatabase = async () => {
           },
         },
         {
-          property: "Sprint",
-          select: {
-            equals: "#13(23/05)",
-          },
+          or: [
+            {
+              property: "Sprint",
+              select: {
+                equals: "#13(23/05)",
+              },
+            },
+            {
+              property: "Sprint",
+              select: {
+                equals: "#12(23/04)",
+              },
+            },
+          ],
         },
       ],
     },
