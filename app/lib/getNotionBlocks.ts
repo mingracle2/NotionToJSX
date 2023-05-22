@@ -27,13 +27,16 @@ import {
 export const getNotionBlocks = async (targetId: string) => {
   // Call API and receive response
   const blockResponse = await (
-    await fetch("http://localhost:3000/api/notion/notionBlockContent", {
-      method: "POST",
-      body: JSON.stringify({ value: targetId }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    await fetch(
+      "https://notion-to-jsx-git-minki-serversideprops-mingracle2.vercel.app/api/notion/notionBlockContent",
+      {
+        method: "POST",
+        body: JSON.stringify({ value: targetId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
   ).json();
 
   const notionBlockList: NotionBasicBlockDoc[] = [];
