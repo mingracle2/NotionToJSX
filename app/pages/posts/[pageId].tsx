@@ -1,12 +1,16 @@
 import { NotionBlock } from "@/src/components/blocks/NotionBlock";
 import { SyncNotionBlockDoc } from "@/type/notion.type";
-import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
+import { constructNotionSyncBlocks } from "@/lib/constructNotionSyncBlocks";
 import { classNames } from "@/utils/functions";
-import { getNotionPage } from "@/utils/getNotionPage";
-import { getPagesFromDatabase } from "@/utils/getPagesFromDatabase";
+import { getNotionPage } from "@/lib/getNotionPage";
+import { getPagesFromDatabase } from "@/lib/getPagesFromDatabase";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import axios from "axios";
+
+export const notionIntegrationToken =
+  "Bearer secret_6Fa7uOy0Rlygt7aD7WNUX4z0sPtHj7Has4Gsjk3pMsx";
 
 interface CustomNotionPageProps {
   pageName: string;
@@ -107,7 +111,7 @@ export async function getStaticPaths() {
 
   return {
     paths,
-    fallback: false,
+    fallback: "blocking",
   };
 }
 

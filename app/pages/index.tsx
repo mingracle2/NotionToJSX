@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { NextPage } from "next";
 
-const IndexPage: React.FC = () => {
+const IndexPage: NextPage = () => {
   const [pageUrl, setPageUrl] = useState("");
   const [pageId, setPageId] = useState("");
   const [isAsync, setIsAsync] = useState(false);
@@ -11,7 +12,7 @@ const IndexPage: React.FC = () => {
 
   useEffect(() => {
     if (pageId) {
-      window.open(`/${pageId}?isAsync=${isAsync}`, "_blank");
+      window.open(`/posts/${pageId}?isAsync=${isAsync}`, "_blank");
     }
   }, [click]);
 

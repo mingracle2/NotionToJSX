@@ -23,24 +23,27 @@ import {
   NotionTableBlockDoc,
   NotionTableRowBlockDoc,
 } from "@/type/notion.type";
+import axios from "axios";
+
+export const notionIntegrationToken =
+  "Bearer secret_6Fa7uOy0Rlygt7aD7WNUX4z0sPtHj7Has4Gsjk3pMsx";
 
 export const getNotionBlocks = async (targetId: string) => {
   // Call API and receive response
-  const blockResponse = await (
-    await fetch(
-      "http://notion-to-jsx-git-minki-staticprops-mingracle2.vercel.app/api/notion/notionBlockContent",
-      {
-        method: "POST",
-        body: JSON.stringify({ value: targetId }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
-  ).json();
+  const config = {
+    method: "get",
+    maxBodyLength: Infinity,
+    url: `https://api.notion.com/v1/blocks/${targetId}/children?page_size=1000`,
+    headers: {
+      "Notion-Version": "2022-02-22",
+      Authorization: notionIntegrationToken,
+    },
+  };
+
+  const response = await axios(config);
 
   const notionBlockList: NotionBasicBlockDoc[] = [];
-  blockResponse.results.map((result: NotionBasicBlockDoc) => {
+  response.data.results.map((result: NotionBasicBlockDoc) => {
     const blockType: BlockTypes = result.type;
     // console.log(result.id + " " + blockType);
     switch (blockType) {

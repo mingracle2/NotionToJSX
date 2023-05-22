@@ -3,7 +3,7 @@ import {
   NotionBasicBlockDoc,
   SyncNotionBlockDoc,
 } from "@/type/notion.type";
-import { getNotionBlocks } from "@/utils/getNotionBlocks";
+import { getNotionBlocks } from "@/lib/getNotionBlocks";
 import { useCallback, useEffect, useState } from "react";
 import NotionTodoBlock from "./NotionTodoBlock";
 import NotionPBlock from "./NotionPBlock";
@@ -23,7 +23,7 @@ import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
 import NotionTableRowBlock from "./NotionTableRowBlock";
 import { addColorClass, classNames } from "@/utils/functions";
-import { constructNotionSyncBlocks } from "@/utils/constructNotionSyncBlocks";
+import { constructNotionSyncBlocks } from "@/lib/constructNotionSyncBlocks";
 
 const renderBlock = (block: any) => {
   switch (block.type) {

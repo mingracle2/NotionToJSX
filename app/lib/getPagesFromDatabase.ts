@@ -1,18 +1,10 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import axios from "axios";
-import type { NextApiRequest, NextApiResponse } from "next";
 
 export const notionIntegrationToken =
   "Bearer secret_6Fa7uOy0Rlygt7aD7WNUX4z0sPtHj7Has4Gsjk3pMsx";
 
-type Data = {
-  name: string;
-};
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
+export const getPagesFromDatabase = async () => {
+  // Call API and receive response
   let filterData = JSON.stringify({
     filter: {
       and: [
@@ -41,7 +33,7 @@ export default async function handler(
   const config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: `https://api.notion.com/v1/databases/${req.body.value}/query`,
+    url: `https://api.notion.com/v1/databases/b95a5d7e0698416aa71337111ebb71db/query`,
     headers: {
       "Content-Type": "application/json",
       "Notion-Version": "2022-02-22",
@@ -52,5 +44,10 @@ export default async function handler(
 
   const response = await axios(config);
 
-  res.status(200).json(response.data);
-}
+  const pageIds: string[] = response.data.results.map((result: any) => {
+    return result.id.replace(/-/g, "");
+  });
+
+  console.log(pageIds);
+  return pageIds;
+};
