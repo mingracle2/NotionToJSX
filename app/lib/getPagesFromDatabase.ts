@@ -11,20 +11,30 @@ export const getPagesFromDatabase = async () => {
         {
           property: "Status",
           select: {
-            equals: "리뷰 중!",
+            equals: "발행 완료",
           },
         },
+        // {
+        //   property: "어센트 검수",
+        //   select: {
+        //     equals: "SEO 검수 완료",
+        //   },
+        // },
         {
-          property: "어센트 검수",
-          select: {
-            equals: "SEO 검수 완료",
-          },
-        },
-        {
-          property: "Sprint",
-          select: {
-            equals: "#13(23/05)",
-          },
+          or: [
+            {
+              property: "Sprint",
+              select: {
+                equals: "#13(23/05)",
+              },
+            },
+            {
+              property: "Sprint",
+              select: {
+                equals: "#12(23/04)",
+              },
+            },
+          ],
         },
       ],
     },
