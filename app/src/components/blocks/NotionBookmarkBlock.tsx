@@ -28,7 +28,7 @@ const NotionBookmarkBlock = ({
     });
 
   return (
-    <div className="notion-row">
+    <div>
       <a
         target="_blank"
         rel="noopener noreferrer"

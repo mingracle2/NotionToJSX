@@ -1,12 +1,5 @@
-import {
-  NotionBulletedListItemBlockDoc,
-  NotionRichText,
-} from "@/type/notion.type";
-import {
-  addColorAndCodeClass,
-  addColorClass,
-  classNames,
-} from "@/utils/functions";
+import { NotionBulletedListItemBlockDoc } from "@/type/notion.type";
+import { classNames } from "@/utils/functions";
 import InitialBlock from "./InitialBlock";
 
 interface NotionUlBlockProps {

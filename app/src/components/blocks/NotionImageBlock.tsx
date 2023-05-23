@@ -79,7 +79,6 @@ const NotionImageBlock = ({ className, block }: NotionImageBlockProps) => {
         <figcaption>
           <pre
             key={block.id}
-            style={{ whiteSpace: "pre-wrap" }}
             className={classNames(className, "notion", "notion-image-caption")}
           >
             {block[block.type].caption?.map(

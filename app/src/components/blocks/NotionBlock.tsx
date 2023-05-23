@@ -23,7 +23,6 @@ import NotionBookmarkBlock from "./NotionBookmarkBlock";
 import NotionLinkPreviewBlock from "./NotionLinkPreviewBlock";
 import NotionTableRowBlock from "./NotionTableRowBlock";
 import { addColorClass, classNames } from "@/utils/functions";
-import { constructNotionSyncBlocks } from "@/lib/constructNotionSyncBlocks";
 
 const renderBlock = (block: any) => {
   switch (block.type) {
@@ -82,19 +81,15 @@ export const NotionBlock = ({
   const [childrenBlocks, setChildrenBlocks] = useState<
     NotionBasicBlockDoc[] | SyncNotionBlockDoc[]
   >([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [numOfChildrenBlocks, setNumOfChildrenBlocks] = useState(0);
 
   const fetchChildren = useCallback(
     async (blockId: string, isAsync: boolean) => {
       if (isAsync) {
         const blocks = await getNotionBlocks(blockId, isAsync);
         setChildrenBlocks(() => blocks);
-        setNumOfChildrenBlocks(() => blocks.length);
       } else {
         if (block) {
           setChildrenBlocks(block.childrenBlocks);
-          setNumOfChildrenBlocks(block.childrenBlocks.length);
         }
       }
     },
@@ -116,12 +111,6 @@ export const NotionBlock = ({
     block?.type === BlockTypes.bulleted_list_item ||
     block?.type === BlockTypes.numbered_list_item;
 
-  const widthOfChildrenColumns =
-    (
-      (100 * (1 - 0.35 * (numOfChildrenBlocks - 1))) /
-      numOfChildrenBlocks
-    ).toFixed(0) + "%";
-
   useEffect(() => {
     if (block && block.has_children) {
       fetchChildren(block.id, isAsync);
@@ -135,7 +124,6 @@ export const NotionBlock = ({
       } else {
         if (syncBlocks) {
           setChildrenBlocks(() => syncBlocks);
-          setNumOfChildrenBlocks(syncBlocks.length);
         }
       }
     }
@@ -150,7 +138,7 @@ export const NotionBlock = ({
     >
       {needToggle ? (
         <details className="notion-toggle">
-          <summary style={{ marginLeft: "5px" }}>
+          <summary>
             <span>{renderBlock(block)}</span>
           </summary>
           <div>
@@ -168,7 +156,7 @@ export const NotionBlock = ({
           </div>
         </details>
       ) : isColumnList ? (
-        <div className="notion-row flex space-x-4">
+        <div className="notion-row">
           {childrenBlocks.map(
             (
               childBlock: NotionBasicBlockDoc | SyncNotionBlockDoc,
@@ -180,7 +168,6 @@ export const NotionBlock = ({
                   style={{
                     ...(index === 0 ? {} : { marginLeft: "15px" }),
                     flex: 1,
-                    width: widthOfChildrenColumns,
                   }}
                 >
                   <NotionBlock
@@ -194,7 +181,7 @@ export const NotionBlock = ({
           )}
         </div>
       ) : isColumn ? (
-        <div className="notion-column" style={{ flex: 1, width: "100%" }}>
+        <div className="notion-column">
           {childrenBlocks.map(
             (childBlock: NotionBasicBlockDoc | SyncNotionBlockDoc) => {
               return (

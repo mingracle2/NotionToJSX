@@ -9,18 +9,20 @@ export const addColorAndCodeClass = (
   color: NotionTextColors
 ) => {
   let className: string = "";
+  if (
+    color &&
+    (color.includes("background") || color === "default") &&
+    (text.annotations.color.includes("background") ||
+      text.annotations.color === "default") &&
+    text.href
+  )
+    className = classNames(className, "notion-gray");
   if (text.annotations.code)
     className = classNames(className, "notion-inline-code");
   if (text.annotations.color !== "default")
     className = classNames(className, "notion-" + text.annotations.color);
   else if (color !== "default")
     className = classNames(className, "notion-" + color);
-  if (
-    color &&
-    (color.includes("background") || color === "default") &&
-    text.href
-  )
-    className = classNames(className, "notion-gray");
   return className;
 };
 
