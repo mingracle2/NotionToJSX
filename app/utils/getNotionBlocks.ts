@@ -1,81 +1,120 @@
-import { NotionBlockNamesDoc } from "@/type/blockNames.type";
-import { NotionBlockAllDoc } from "@/type/notion.type";
+import {
+  NotionBasicBlockDoc,
+  BlockTypes,
+  NotionHeading1BlockDoc,
+  NotionHeading2BlockDoc,
+  NotionHeading3BlockDoc,
+  NotionTodoBlockDoc,
+  NotionBulletedListItemBlockDoc,
+  NotionNumberedListItemBlockDoc,
+  NotionBookmarkBlockDoc,
+  NotionCalloutBlockDoc,
+  NotionCodeBlockDoc,
+  NotionColumnBlockDoc,
+  NotionColumnListBlockDoc,
+  NotionDividerBlockDoc,
+  NotionEmbedBlockDoc,
+  NotionImageBlockDoc,
+  NotionParagraphBlockDoc,
+  NotionQuoteBlockDoc,
+  NotionToggleBlockDoc,
+  NotionVideoBlockDoc,
+  NotionLinkPreviewBlockDoc,
+  NotionTableBlockDoc,
+  NotionTableRowBlockDoc,
+} from "../types/notion.type";
+import axios from "axios";
+
+const notionIntegrationToken =
+  "Bearer secret_cvH8ZJg1mJScYFPHxEPqzyPpDTUqpgVVsXwXwx8Z7k4";
 
 export const getNotionBlocks = async (targetId: string) => {
   // Call API and receive response
-  const blockResponse = await (
-    await fetch("api/notion/notionBlockContent", {
-      method: "POST",
-      body: JSON.stringify({ value: targetId }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-  ).json();
+  // if (!isAsync) {
+  const config = {
+    method: "get",
+    maxBodyLength: Infinity,
+    url: `https://api.notion.com/v1/blocks/${targetId}/children?page_size=1000`,
+    headers: {
+      "Notion-Version": "2022-02-22",
+      Authorization: notionIntegrationToken,
+    },
+  };
 
-  //   console.log(blockResponse);
-  const notionBlockList: NotionBlockAllDoc[] = [];
-  blockResponse.results.map((result: NotionBlockAllDoc, index: Number) => {
-    let blockType: NotionBlockNamesDoc = result.type;
-    console.log(result.id + " " + blockType);
+  const blockResponse = await axios(config);
+  const response = blockResponse.data;
+
+  const notionBlockList: NotionBasicBlockDoc[] = [];
+  response.results.map((result: NotionBasicBlockDoc) => {
+    const blockType: BlockTypes = result.type;
+    // console.log(result.id + " " + blockType);
     switch (blockType) {
-      case NotionBlockNamesDoc.PARAGRAPH:
-      case NotionBlockNamesDoc.QUOTE:
-      case NotionBlockNamesDoc.BULLETED_LIST_ITEM:
-      case NotionBlockNamesDoc.NUMBERED_LIST_ITEM:
-      case NotionBlockNamesDoc.TOGGLE:
-        const textTypeBlock: NotionBlockAllDoc = result;
-
-        notionBlockList.push(textTypeBlock);
+      case BlockTypes.paragraph:
+        notionBlockList.push(result as NotionParagraphBlockDoc);
         break;
-      case NotionBlockNamesDoc.HEADING_1:
-      case NotionBlockNamesDoc.HEADING_2:
-      case NotionBlockNamesDoc.HEADING_3:
-        const headingBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(headingBlock);
+      case BlockTypes.quote:
+        notionBlockList.push(result as NotionQuoteBlockDoc);
         break;
-      case NotionBlockNamesDoc.TO_DO:
-        const todoBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(todoBlock);
+      case BlockTypes.bulleted_list_item:
+        notionBlockList.push(result as NotionBulletedListItemBlockDoc);
         break;
-      case NotionBlockNamesDoc.CODE:
-        const codeBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(codeBlock);
+      case BlockTypes.numbered_list_item:
+        notionBlockList.push(result as NotionNumberedListItemBlockDoc);
         break;
-      case NotionBlockNamesDoc.CALLOUT:
-        const calloutBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(calloutBlock);
+      case BlockTypes.toggle:
+        notionBlockList.push(result as NotionToggleBlockDoc);
         break;
-      case NotionBlockNamesDoc.DIVIDER:
-        const dividerBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(dividerBlock);
+      case BlockTypes.heading_1:
+        notionBlockList.push(result as NotionHeading1BlockDoc);
         break;
-      case NotionBlockNamesDoc.IMAGE:
-        const imageBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(imageBlock);
+      case BlockTypes.heading_2:
+        notionBlockList.push(result as NotionHeading2BlockDoc);
         break;
-      case NotionBlockNamesDoc.VIDEO:
-        const videoBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(videoBlock);
+      case BlockTypes.heading_3:
+        notionBlockList.push(result as NotionHeading3BlockDoc);
         break;
-      case NotionBlockNamesDoc.EMBED:
-        const embedBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(embedBlock);
+      case BlockTypes.to_do:
+        notionBlockList.push(result as NotionTodoBlockDoc);
         break;
-      case NotionBlockNamesDoc.COLUMN_LIST:
-        const columnListBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(columnListBlock);
+      case BlockTypes.code:
+        notionBlockList.push(result as NotionCodeBlockDoc);
         break;
-      case NotionBlockNamesDoc.COLUMN:
-        const columnBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(columnBlock);
+      case BlockTypes.callout:
+        notionBlockList.push(result as NotionCalloutBlockDoc);
         break;
-      case NotionBlockNamesDoc.BOOKMARK:
-        const bookmarkBlock: NotionBlockAllDoc = result;
-        notionBlockList.push(bookmarkBlock);
+      case BlockTypes.divider:
+        notionBlockList.push(result as NotionDividerBlockDoc);
+        break;
+      case BlockTypes.image:
+        notionBlockList.push(result as NotionImageBlockDoc);
+        break;
+      case BlockTypes.video:
+        notionBlockList.push(result as NotionVideoBlockDoc);
+        break;
+      case BlockTypes.embed:
+        notionBlockList.push(result as NotionEmbedBlockDoc);
+        break;
+      case BlockTypes.column_list:
+        notionBlockList.push(result as NotionColumnListBlockDoc);
+        break;
+      case BlockTypes.column:
+        notionBlockList.push(result as NotionColumnBlockDoc);
+        break;
+      case BlockTypes.bookmark:
+        notionBlockList.push(result as NotionBookmarkBlockDoc);
+        break;
+      case BlockTypes.link_preview:
+        notionBlockList.push(result as NotionLinkPreviewBlockDoc);
+        break;
+      case BlockTypes.table:
+        notionBlockList.push(result as NotionTableBlockDoc);
+        break;
+      case BlockTypes.table_row:
+        notionBlockList.push(result as NotionTableRowBlockDoc);
         break;
       default:
     }
   });
+
   return notionBlockList;
 };
