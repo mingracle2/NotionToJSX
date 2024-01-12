@@ -42,18 +42,6 @@ const CustomNotionPage: NextPage<CustomNotionPageProps> = (props) => {
           : parameterValue
           ? parameterValue
           : supplementImageFormat;
-
-      fetch(`${window.location.origin}/api/image`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageUrl: props.pageCover || props.pageHeaderImage,
-          imageFormat: imageFormat,
-          directory: `curation-hub/contents/${pageId}/cover.${imageFormat}`,
-        }),
-      });
     }
   }, [pageId]);
 
